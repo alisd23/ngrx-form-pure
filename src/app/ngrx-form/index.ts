@@ -1,4 +1,4 @@
-export * from './ngrx-form.module';
-export * from './ngrx-form.reducer';
-export * from './form-actions';
+export * from './module';
+export * from './reducer';
+export * from './actions';
 export * from './types';

@@ -1,6 +1,5 @@
-import { Directive, OnChanges, forwardRef, Input } from '@angular/core';
-import { FieldDirective } from './index';
-import { FormContainer } from './form-container';
+import { Directive, OnChanges, forwardRef, Input, Output, HostListener, EventEmitter } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 @Directive({
   selector: '[ngrxForm]',
@@ -8,14 +7,18 @@ import { FormContainer } from './form-container';
 })
 export class FormDirective implements OnChanges {
   @Input('ngrxForm') private _name: string;
+  @Output('submit') private _submit = new EventEmitter();
+  private _store: Store<any>;
 
-  private _fields: FieldDirective[] = [];
+  constructor(store: Store<any>) {
+    this._store = store;
+  }
+
+  @HostListener('submit', ['$event']) onSubmit(event) {
+    
+  }
 
   public get formName() { return this._name; }
-
-  public registerField(field: FieldDirective) {
-    this._fields.push(field);
-  }
 
   ngOnChanges(changes) {
     console.log(changes);

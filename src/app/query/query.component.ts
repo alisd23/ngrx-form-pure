@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { AppState, QueryFormShape, AppFormState } from '../app-store.module';
-import { FormState, getFormActions, FormActions } from '../ngrx-form';
+import { AppState, AppFormState } from '../app-store.module';
+import { IFormState, getFormActions, FormActions } from '../ngrx-form';
+
+const queryFormActions = getFormActions<AppFormState>('query');
 
 @Component({
   selector: 'app-query',
@@ -10,14 +12,12 @@ import { FormState, getFormActions, FormActions } from '../ngrx-form';
   styleUrls: ['./query.component.css']
 })
 export class QueryComponent {
-  queryForm: Observable<FormState<QueryFormShape>>;
-  queryFormActions: FormActions<AppFormState, QueryFormShape>;
+  queryForm: Observable<AppFormState['query']>;
 
   constructor(private store: Store<AppState>) {
     this.queryForm = store.select('forms').select('query');
-    this.queryFormActions = getFormActions();
 
-    this.store.dispatch(this.queryFormActions.initForm('query', {
+    this.store.dispatch(queryFormActions.initForm({
       name: 'Alex',
       age: 23
     }));
