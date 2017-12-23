@@ -1,14 +1,11 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { StoreModule, ActionReducer } from '@ngrx/store';
+import { StoreModule } from '@ngrx/store';
 import { storeLogger } from 'ngrx-store-logger';
-import { formReducer, NgrxFormModule, IFormState } from './ngrx-form';
-import { AppComponent } from './app.component';
-import { QueryComponent } from './query/query.component';
+import { formReducer, IFormState } from './ngrx-form';
 
 export interface QueryFormShape {
   name: string;
-  age: number;
+  age: string;
 }
 
 export interface AppFormState {

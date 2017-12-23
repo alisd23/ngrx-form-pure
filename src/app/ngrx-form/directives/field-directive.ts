@@ -4,10 +4,11 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/publish';
 
 import { FormDirective } from './form-directive';
 import { getFormActions, FormActions } from '../actions';
-import { IFormControls } from '../types';
+import { IFormFieldState } from '../types';
 
 interface IFieldEvent {
   type: 'blur' | 'input' | 'focus';
@@ -19,6 +20,7 @@ interface IFieldEvent {
 })
 export class FieldDirective implements OnInit {
   @Input('ngrxField') name: string;
+  @Input('ngrxInitialValue') initialValue: any;
 
   @HostBinding('attr.value') private _value: any;
   private _store: Store<any>;
@@ -27,7 +29,7 @@ export class FieldDirective implements OnInit {
   private _parent: FormDirective;
 
   private _fieldEvent$ = new EventEmitter<IFieldEvent>();
-  private _formState$: Observable<IFormControls<any>>;
+  private _fieldState$: Observable<IFormFieldState<any>>;
 
   private get formName() { return this._parent.formName; }
 
@@ -59,22 +61,22 @@ export class FieldDirective implements OnInit {
   ngOnInit() {
     this._formActions = getFormActions(this.formName);
 
-    this._formState$ = this._store
-      .select('forms')
-      .select(this.formName);
+    this._fieldState$ = this._store
+      .select('forms', this.formName, 'fields', this.name)
+      .filter(Boolean);
 
     // Fire *change* action when field changes its value (input event)
     this._fieldEvent$
       .filter(event => event.type === 'input')
       .map(event => event.value)
       .withLatestFrom(
-        this._formState$,
-        (value, state) => ({ value, state })
+        this._fieldState$,
+        (value, fieldState) => ({ value, fieldState })
       )
-      .filter(({ value, state }) => value !== state[this.name])
+      .filter(({ value, fieldState }) => value !== fieldState.value)
       .subscribe(
         ({ value }) => this._store.dispatch(
-          this._formActions.changeField(this.name, this._el.nativeElement.value)
+          this._formActions.changeField(this.name, value ? value : undefined)
         )
       );
 
@@ -98,12 +100,15 @@ export class FieldDirective implements OnInit {
 
     // Subscribe to changes in the fields value from the form store
     // and update the inputs value when a change occurs
-    this._store
-      .select('forms')
-      .select(this.formName)
-      .filter((state: IFormControls<any>) => state[this.name] !== this._value)
-      .subscribe((state: IFormControls<any>) => {
-        this._value = state[this.name].value;
+    this._fieldState$
+      .filter((fieldState: IFormFieldState<any>) => fieldState.value !== this._value)
+      .subscribe((fieldState: IFormFieldState<any>) => {
+        this._value = fieldState.value;
       });
+      
+    // Register field with form state
+    this._store.dispatch(
+      this._formActions.registerField(this.name, this.initialValue)
+    )
   }
 }

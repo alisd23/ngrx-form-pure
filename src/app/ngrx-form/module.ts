@@ -1,12 +1,14 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { FieldDirective, FormDirective } from './directives';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   declarations: [
     FieldDirective,
     FormDirective
+  ],
+  imports: [
+    EffectsModule.forRoot([])
   ],
   exports: [
     FieldDirective,

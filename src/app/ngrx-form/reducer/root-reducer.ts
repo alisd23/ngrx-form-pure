@@ -1,23 +1,24 @@
-import { IFormFieldState, IFormReducerState } from '../types';
-import { Actions } from '../actions';
+import { IFormReducerState } from '../types';
+import { Actions, ActionConstants } from '../actions';
 import { formReducer } from './form-reducer';
 
 export function rootReducer(
   state: IFormReducerState = {},
   action: Actions<IFormReducerState, any>
-) {
+): IFormReducerState {
   switch (action.type) {
-    case '@ngrx-form/destroy': {
+    case ActionConstants.DESTROY: {
       const { formName } = action.payload;
       return {
         ...state,
         [formName]: undefined
       };
     }
-    case '@ngrx-form/init':
-    case '@ngrx-form/focus':
-    case '@ngrx-form/blur':
-    case '@ngrx-form/change': {
+    case ActionConstants.INIT:
+    case ActionConstants.REGISTER_FIELD:
+    case ActionConstants.FOCUS:
+    case ActionConstants.BLUR:
+    case ActionConstants.CHANGE: {
       const { formName } = action.payload;
       return {
         ...state,

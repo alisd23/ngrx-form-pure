@@ -1,24 +1,34 @@
-import { IFormFieldState, IFormReducerState, IFormState } from '../types';
-import { Actions } from '../actions';
+import { IFormFieldState, IFormReducerState } from '../types';
+import { Actions, ActionConstants } from '../actions';
+
+const initialState = {
+  focus: false
+}
 
 export function fieldReducer(
   state: IFormFieldState<any>,
   action: Actions<IFormReducerState, any>
-) {
+): IFormFieldState<any> {
   switch (action.type) {
-    case '@ngrx-form/focus': {
+    case ActionConstants.REGISTER_FIELD: {
+      return {
+        ...initialState,
+        value: action.payload.initialValue
+      };
+    }
+    case ActionConstants.FOCUS: {
       return {
         ...state,
         focus: true
       };
     }
-    case '@ngrx-form/blur': {
+    case ActionConstants.BLUR: {
       return {
         ...state,
         focus: false
       };
     }
-    case '@ngrx-form/change': {
+    case ActionConstants.CHANGE: {
       return {
         ...state,
         value: action.payload.value

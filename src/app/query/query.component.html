@@ -1,7 +1,21 @@
-<form ngrxForm="query">
+<form
+  ngrxForm="query"
+  [ngrxFieldValidators]="fieldValidators"
+  (ngrxSubmit)="onSubmit($event)"
+>
   <div>
     <h2>Query Form</h2>
-    <input ngrxField="name" placeholder="Name" />
-    <input ngrxField="age" placeholder="Age" />
+    <input
+      ngrxField="name"
+      [ngrxInitialValue]="initialValues.name"
+      placeholder="Name"
+    />
+    <input
+      ngrxField="age"
+      [ngrxInitialValue]="initialValues.age"
+      placeholder="Age"
+      type="number"
+    />
+    <button type="submit">Submit</button>
   </div>
 </form>

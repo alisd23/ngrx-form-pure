@@ -1,39 +1,30 @@
-import { IFormFieldState, IFormReducerState, IFormState } from '../types';
-import { Actions } from '../actions';
+import { IFormReducerState, IFormState } from '../types';
+import { Actions, ActionConstants } from '../actions';
 import { fieldReducer } from './field-reducer';
-
-const initialiseField = (value): IFormFieldState<any> => ({
-  value,
-  focus: false
-});
 
 export function formReducer(
   state: IFormState<any>,
   action: Actions<IFormReducerState, any>
-) {
+): IFormState<any> {
   switch (action.type) {
-    case '@ngrx-form/init': {
-      const { formName, initialState } = action.payload;
+    case ActionConstants.INIT: {
+      const { formName } = action.payload;
       return {
         name: formName,
         hasErrors: false,
-        controls: Object
-          .keys(initialState)
-          .reduce((result, fieldName) => ({
-            ...result,
-            [fieldName]: initialiseField(initialState[fieldName])
-          }), {})
+        fields: {}
       };
     }
-    case '@ngrx-form/focus':
-    case '@ngrx-form/blur':
-    case '@ngrx-form/change': {
+    case ActionConstants.FOCUS:
+    case ActionConstants.BLUR:
+    case ActionConstants.REGISTER_FIELD:
+    case ActionConstants.CHANGE: {
       const { fieldName } = action.payload;
       return {
         ...state,
-        controls: {
-          ...state.controls,
-          [fieldName]: fieldReducer(state.controls[fieldName], action)
+        fields: {
+          ...state.fields,
+          [fieldName]: fieldReducer(state.fields[fieldName], action)
         }
       };
     }

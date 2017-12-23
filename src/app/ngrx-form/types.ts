@@ -14,7 +14,7 @@ export type IFormControls<FormShape> = {
  * 
  * interface Form {                              interface IFormValues<Form> {
  *   name: string;                                 age: string;
- *   controls: {                                   name: string;
+ *   fields: {                                   name: string;
  *     age: { value: string; ...}       =>       }
  *     name: { value: string; ...}
  *   }
@@ -22,7 +22,15 @@ export type IFormControls<FormShape> = {
  * }
  */
 export type IFormValues<Form extends IFormState<any>> = {
-  [FieldName in keyof Form['controls']]: Form['controls'][FieldName]['value'];
+  [FieldName in keyof Form['fields']]: Form['fields'][FieldName]['value'];
+};
+
+/**
+ * Interface for the field errors of a form, which is a mapping of form shape
+ * to string error
+ */
+export type IFieldErrors<FormShape> = {
+  [Field in keyof FormShape]?: string;
 };
 
 /**
@@ -36,7 +44,7 @@ export type IFormValues<Form extends IFormState<any>> = {
  */
 export interface IFormState<FormShape> {
   name: string;
-  controls: IFormControls<FormShape>;
+  fields: IFormControls<FormShape>;
   hasErrors: boolean;
 }
 
@@ -56,3 +64,4 @@ export interface IFormFieldState<V> {
 export interface IFormReducerState {
   [id: string]: IFormState<any>;
 }
+

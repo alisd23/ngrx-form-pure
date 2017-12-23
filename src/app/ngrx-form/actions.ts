@@ -1,97 +1,135 @@
 import { Action } from '@ngrx/store';
-import { IFormReducerState, IFormState, IFormValues } from './types';
+import { IFormReducerState, IFormState, IFormValues, IFieldErrors } from './types';
 
 // ========================= //
 //        ACTION TYPES       //
 // ========================= //
-interface InitAction<RootShape, IFormState> extends Action {
-  type: '@ngrx-form/init';
+
+export enum ActionConstants {
+  INIT = '@ngrx-form/init',
+  DESTROY = '@ngrx-form/destroy',
+  FOCUS = '@ngrx-form/focus',
+  BLUR = '@ngrx-form/blur',
+  CHANGE = '@ngrx-form/change',
+  UPDATE_FIELD_ERRORS = '@ngrx-form/update-field-errors',
+  REGISTER_FIELD = '@ngrx-form/register-field'
+}
+
+interface InitFormAction<RootState> extends Action {
+  type: ActionConstants.INIT;
   payload: {
-    formName: keyof RootShape;
-    initialState: {
-      [P in keyof IFormState]: IFormState[P]
-    };
+    formName: keyof RootState;
   };
 }
 
-interface DestroyAction<RootShape> extends Action {
-  type: '@ngrx-form/destroy';
-  payload: { formName: keyof RootShape };
+interface DestroyAction<RootState> extends Action {
+  type: ActionConstants.DESTROY;
+  payload: { formName: keyof RootState };
 }
 
-interface FocusFieldAction<RootShape, FormShape> extends Action {
-  type: '@ngrx-form/focus';
+interface FocusFieldAction<RootState, FormState> extends Action {
+  type: ActionConstants.FOCUS;
   payload: {
-    formName: keyof RootShape;
-    fieldName: keyof FormShape;
+    formName: keyof RootState;
+    fieldName: keyof FormState;
   };
 }
 
-interface BlurFieldAction<RootShape, FormShape> extends Action {
-  type: '@ngrx-form/blur';
+interface BlurFieldAction<RootState, FormState> extends Action {
+  type: ActionConstants.BLUR;
   payload: {
-    formName: keyof RootShape;
-    fieldName: keyof FormShape;
+    formName: keyof RootState;
+    fieldName: keyof FormState;
   };
 }
 
-interface ChangeFieldAction<RootShape, FormShape> extends Action {
-  type: '@ngrx-form/change';
+interface ChangeFieldAction<RootState, FormState> extends Action {
+  type: ActionConstants.CHANGE;
   payload: {
-    formName: keyof RootShape;
-    fieldName: keyof FormShape;
-    value: any;
+    formName: keyof RootState;
+    fieldName: keyof FormState;
+    value?: any;
   };
+}
+
+interface UpdateFieldErrors<FormState> extends Action {
+  type: ActionConstants.UPDATE_FIELD_ERRORS;
+  payload: {
+    errors: IFieldErrors<FormState>;
+  }
+}
+
+interface RegisterFieldAction<RootState, FormShape extends IFormValues<any>> extends Action {
+  type: ActionConstants.REGISTER_FIELD;
+  payload: {
+    formName: keyof RootState;
+    fieldName: keyof FormShape
+    initialValue?: FormShape[keyof FormShape];
+  }
 }
 
 export type Actions<S extends IFormReducerState, F extends IFormState<any>> =
-  InitAction<S, F> |
+  InitFormAction<S> |
   DestroyAction<S> |
   FocusFieldAction<S, F> |
   BlurFieldAction<S, F> |
-  ChangeFieldAction<S, F>;
+  ChangeFieldAction<S, F> |
+  UpdateFieldErrors<F> |
+  RegisterFieldAction<S, F>;
 
-
+  
 // ========================= //
 //        ACTION CREATORS    //
 // ========================= //
 
-export interface FormActions<RootShape, Form extends IFormState<any>> {
-  initForm: (initialState: IFormValues<Form>)
-    => InitAction<RootShape, IFormValues<Form>>;
-  destroyForm: ()
-    => DestroyAction<RootShape>;
-  focusField: (fieldName: keyof IFormValues<Form>)
-    => FocusFieldAction<RootShape, IFormValues<Form>>;
-  blurField: (fieldName: keyof IFormValues<Form>)
-    => BlurFieldAction<RootShape, IFormValues<Form>>;
-  changeField: (fieldName: keyof IFormValues<Form>, value: any)
-    => ChangeFieldAction<RootShape, IFormValues<Form>>;
+export interface FormActions<RootState, Form extends IFormState<any>> {
+  initForm: () =>
+    InitFormAction<RootState>;
+  destroyForm: () =>
+    DestroyAction<RootState>;
+  focusField: (fieldName: keyof IFormValues<Form>) =>
+    FocusFieldAction<RootState, IFormValues<Form>>;
+  blurField: (fieldName: keyof IFormValues<Form>) =>
+    BlurFieldAction<RootState, IFormValues<Form>>;
+  changeField: (fieldName: keyof IFormValues<Form>, value: any) =>
+    ChangeFieldAction<RootState, IFormValues<Form>>;
+  updateFieldErrors: (errors: IFieldErrors<any>) =>
+    UpdateFieldErrors<any>
+  registerField: (fieldName: keyof IFormValues<Form>, initialValue?: any) =>
+    RegisterFieldAction<RootState, IFormValues<Form>>;
 }
 
 // Create actions given form shape (Makes Typings work nicely)
 export function getFormActions<RootShape extends any>(formName: keyof RootShape):
   FormActions<RootShape, RootShape[keyof RootShape]> {
   return {
-    initForm: (initialState) => ({
-      type: '@ngrx-form/init',
-      payload: { formName, initialState }
+    initForm: () => ({
+      type: ActionConstants.INIT,
+      payload: { formName }
     }),
     destroyForm: () => ({
-      type: '@ngrx-form/destroy',
+      type: ActionConstants.DESTROY,
       payload: { formName }
     }),
     focusField: (fieldName) => ({
-      type: '@ngrx-form/focus',
+      type: ActionConstants.FOCUS,
       payload: { formName, fieldName }
     }),
     blurField: (fieldName) => ({
-      type: '@ngrx-form/blur',
+      type: ActionConstants.BLUR,
       payload: { formName, fieldName }
     }),
     changeField: (fieldName, value) => ({
-      type: '@ngrx-form/change',
+      type: ActionConstants.CHANGE,
       payload: { formName, fieldName, value }
+    }),
+    updateFieldErrors: (errors) => ({
+      type: ActionConstants.UPDATE_FIELD_ERRORS,
+      payload: { errors }
+    }),
+    registerField: (fieldName, initialValue) => ({
+      type: ActionConstants.REGISTER_FIELD,
+      payload: { formName, fieldName, initialValue }
     })
   };
 }

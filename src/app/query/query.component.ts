@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { AppState, AppFormState } from '../app-store.module';
-import { IFormState, getFormActions, FormActions } from '../ngrx-form';
+import { AppState, AppFormState, QueryFormShape } from '../app-store.module';
+import { getFormActions, IFieldValidators, validators } from '../ngrx-form';
 
 const queryFormActions = getFormActions<AppFormState>('query');
 
@@ -12,14 +12,30 @@ const queryFormActions = getFormActions<AppFormState>('query');
   styleUrls: ['./query.component.css']
 })
 export class QueryComponent {
-  queryForm: Observable<AppFormState['query']>;
+  private _queryForm: Observable<AppFormState['query']>;
+
+  initialValues: QueryFormShape = {
+    name: 'Alex',
+    age: '23'
+  }
+  fieldValidators: IFieldValidators<QueryFormShape> = {
+    name: [validators.required('Name')]
+  };
 
   constructor(private store: Store<AppState>) {
-    this.queryForm = store.select('forms').select('query');
+    this._queryForm = this.store.select('forms').select('query');
+    this._queryForm.subscribe(console.log);
+  }
 
-    this.store.dispatch(queryFormActions.initForm({
-      name: 'Alex',
-      age: 23
-    }));
+  onSubmit(values: QueryFormShape) {
+    console.log('Submitted', values);
+  }
+
+  onReset() {
+    (queryFormActions as any).reset();
   }
 }
+
+// ON FIELD CHANGE
+// - Show field error when field is wrong and field is "dirty"
+// - Show overall form error (maybe?) 
