@@ -5,17 +5,48 @@
 >
   <div>
     <h2>Query Form</h2>
-    <input
+    <div>
+      <input
       ngrxField="name"
       [ngrxInitialValue]="initialValues.name"
       placeholder="Name"
-    />
-    <input
+      />
+    </div>
+    <div>
+      <input
       ngrxField="age"
       [ngrxInitialValue]="initialValues.age"
       placeholder="Age"
       type="number"
-    />
+      />
+    </div>
+    <div>
+      <select
+        ngrxField="colour"
+      >
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+        <option value="green">Green</option>
+      </select>
+    </div>
+    <div>
+      <label>Male</label>
+      <input
+      ngrxField="gender"
+      name="gender"
+      type="radio"
+      value="male"
+      />
+    </div>
+    <div>
+      <label>Female</label>
+      <input
+        ngrxField="gender"
+        name="gender"
+        type="radio"
+        value="female"
+      />
+    </div>
     <button type="submit">Submit</button>
   </div>
 </form>

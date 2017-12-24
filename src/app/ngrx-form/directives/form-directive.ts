@@ -3,12 +3,11 @@ import { Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/do';
 
 import { IFormState } from '../types';
 import { getFormActions, FormActions, ActionConstants } from '../actions';
-import { IFieldValidators } from '../validation';
 import { getFormValues } from '../selectors';
+import { IFieldValidators } from '../validation';
 
 @Directive({
   selector: '[ngrxForm]'
@@ -47,6 +46,7 @@ export class FormDirective implements OnInit {
 
     const fieldNames = Object.keys(this._fieldValidators);
     const errors = {};
+    let errorChanged = false;
 
     for (const fieldName of fieldNames) {
       const validators = this._fieldValidators[fieldName];
@@ -54,16 +54,23 @@ export class FormDirective implements OnInit {
         // Run through validators in order until first validator returns something
         // truthy - the error string.
         for (const validate of validators) {
-          const error = validate(state.fields[fieldName]);
-          if (error) {
-            errors[fieldName] = error;
+          const currentError = state.fields[fieldName].error;
+          const newError = validate(state.fields[fieldName].value);
+
+          // If the current error (or none) for this field is different from the new calculated
+          // error (i.e. the fields error state has changed) then add this to the object
+          if (currentError !== newError) {
+            errorChanged = true;
+            errors[fieldName] = newError;
             break;
           }
         }
       }
     }
 
-    this._store.dispatch(this._formActions.updateFieldErrors(errors));
+    if (errorChanged) {
+      this._store.dispatch(this._formActions.updateFieldErrors(errors));
+    }
   }
 
   /**
@@ -95,12 +102,12 @@ export class FormDirective implements OnInit {
       ActionConstants.INIT
     ] as string[];
 
-    this._formState$
+    this._actions$
+      .filter(action => errorCheckActionTypes.indexOf(action.type) !== -1)
       .withLatestFrom(
-        this._actions$,
-        (state, action) => ({ state, action })  
+        this._formState$,
+        (action, state) => ({ action, state })  
       )
-      .filter(({ action }) => errorCheckActionTypes.indexOf(action.type) !== -1)
-      // .subscribe(({ state }) => this.updateFieldErrors(state));    
+      .subscribe(({ state }) => this.updateFieldErrors(state));    
   }
 }

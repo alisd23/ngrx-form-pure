@@ -16,6 +16,7 @@ export function rootReducer(
     }
     case ActionConstants.INIT:
     case ActionConstants.REGISTER_FIELD:
+    case ActionConstants.UPDATE_FIELD_ERRORS:
     case ActionConstants.FOCUS:
     case ActionConstants.BLUR:
     case ActionConstants.CHANGE: {

@@ -8,7 +8,7 @@ import 'rxjs/add/operator/publish';
 
 import { FormDirective } from './form-directive';
 import { getFormActions, FormActions } from '../actions';
-import { IFormFieldState } from '../types';
+import { IFormFieldState } from '../index';
 
 interface IFieldEvent {
   type: 'blur' | 'input' | 'focus';

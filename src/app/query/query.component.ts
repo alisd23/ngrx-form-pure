@@ -14,17 +14,18 @@ const queryFormActions = getFormActions<AppFormState>('query');
 export class QueryComponent {
   private _queryForm: Observable<AppFormState['query']>;
 
-  initialValues: QueryFormShape = {
+  initialValues: Partial<QueryFormShape> = {
     name: 'Alex',
     age: '23'
   }
   fieldValidators: IFieldValidators<QueryFormShape> = {
-    name: [validators.required('Name')]
+    name: [validators.required('Name')],
+    age: [validators.required('Age')]
   };
 
   constructor(private store: Store<AppState>) {
     this._queryForm = this.store.select('forms').select('query');
-    this._queryForm.subscribe(console.log);
+    this._queryForm.subscribe(() => {});
   }
 
   onSubmit(values: QueryFormShape) {

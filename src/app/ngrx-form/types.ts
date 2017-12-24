@@ -4,7 +4,7 @@
  * This is the interface used for the "controls" property of the IFormState interface.
  * 
  */
-export type IFormControls<FormShape> = {
+export type IFormFields<FormShape> = {
   [FieldName in keyof FormShape]: IFormFieldState<FormShape[FieldName]>;
 };
 
@@ -14,15 +14,15 @@ export type IFormControls<FormShape> = {
  * 
  * interface Form {                              interface IFormValues<Form> {
  *   name: string;                                 age: string;
- *   fields: {                                   name: string;
+ *   fields: {                                     name: string;
  *     age: { value: string; ...}       =>       }
  *     name: { value: string; ...}
  *   }
- *  ...
+ *   ...
  * }
  */
-export type IFormValues<Form extends IFormState<any>> = {
-  [FieldName in keyof Form['fields']]: Form['fields'][FieldName]['value'];
+export type IFormValues<FormShape> = {
+  [FieldName in keyof FormShape]: FormShape[FieldName];
 };
 
 /**
@@ -44,7 +44,8 @@ export type IFieldErrors<FormShape> = {
  */
 export interface IFormState<FormShape> {
   name: string;
-  fields: IFormControls<FormShape>;
+  initialValues?: FormShape;
+  fields: IFormFields<FormShape>;
   hasErrors: boolean;
 }
 
@@ -53,8 +54,10 @@ export interface IFormState<FormShape> {
  * "V" is the field value type (e.g. string, number)
  */
 export interface IFormFieldState<V> {
-  value: V;
+  error?: string;
   focus: boolean;
+  value: V;
+  count: number;
 }
 
 /**

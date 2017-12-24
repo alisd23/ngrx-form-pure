@@ -6,6 +6,8 @@ import { formReducer, IFormState } from './ngrx-form';
 export interface QueryFormShape {
   name: string;
   age: string;
+  colour: string;
+  gender: string;
 }
 
 export interface AppFormState {
