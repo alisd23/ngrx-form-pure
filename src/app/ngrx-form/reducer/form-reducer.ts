@@ -15,6 +15,29 @@ export function formReducer(
         hasErrors: false,
       };
     }
+    case ActionConstants.SET_INITIAL_VALUES: {
+      const { values, formName } = action.payload;
+      const fieldNames = Object.keys(values);
+      const fieldsState = { ...state.fields };
+
+      for (const name of fieldNames) {
+        // Reuse CHANGE action in field reducer to set field value to the initial value
+        fieldsState[name] = fieldReducer(state.fields[name], {
+          type: ActionConstants.CHANGE,
+          payload: {
+            formName,
+            fieldName: name,
+            value: values[name]
+          }
+        });
+      }
+
+      return {
+        ...state,
+        fields: fieldsState,
+        initialValues: values
+      }
+    }
     case ActionConstants.UPDATE_FIELD_ERRORS: {
       // Includes the new error state for ALL fields in the form
       // undefined = no error

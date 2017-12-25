@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { AppState, AppFormState, QueryFormShape } from '../app-store.module';
 import { getFormActions, IFieldValidators, validators } from '../ngrx-form';
+import { Colours } from '../types';
 
 const queryFormActions = getFormActions<AppFormState>('query');
 
@@ -13,10 +14,14 @@ const queryFormActions = getFormActions<AppFormState>('query');
 })
 export class QueryComponent {
   private _queryForm: Observable<AppFormState['query']>;
+  
+  public colours = Object.keys(Colours);
 
   initialValues: Partial<QueryFormShape> = {
     name: 'Alex',
-    age: '23'
+    age: '23',
+    colour: Colours.green
+
   }
   fieldValidators: IFieldValidators<QueryFormShape> = {
     name: [validators.required('Name')],
@@ -26,6 +31,8 @@ export class QueryComponent {
   constructor(private store: Store<AppState>) {
     this._queryForm = this.store.select('forms').select('query');
     this._queryForm.subscribe(() => {});
+
+    console.log(Object.keys(Colours));
   }
 
   onSubmit(values: QueryFormShape) {

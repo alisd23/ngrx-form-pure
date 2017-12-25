@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { storeLogger } from 'ngrx-store-logger';
 import { formReducer, IFormState } from './ngrx-form';
+import { Colours, Sexes } from './types';
 
 export interface QueryFormShape {
   name: string;
   age: string;
-  colour: string;
-  gender: string;
+  colour: Colours;
+  sex: Sexes;
 }
 
 export interface AppFormState {

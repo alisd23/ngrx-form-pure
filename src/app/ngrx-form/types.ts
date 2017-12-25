@@ -9,23 +9,6 @@ export type IFormFields<FormShape> = {
 };
 
 /**
- * Converts a IFormState type into an interface mapping of field names to their
- * value type. E.g.
- * 
- * interface Form {                              interface IFormValues<Form> {
- *   name: string;                                 age: string;
- *   fields: {                                     name: string;
- *     age: { value: string; ...}       =>       }
- *     name: { value: string; ...}
- *   }
- *   ...
- * }
- */
-export type IFormValues<FormShape> = {
-  [FieldName in keyof FormShape]: FormShape[FieldName];
-};
-
-/**
  * Interface for the field errors of a form, which is a mapping of form shape
  * to string error
  */

@@ -1,41 +1,38 @@
 <form
   ngrxForm="query"
   [ngrxFieldValidators]="fieldValidators"
+  [ngrxInitialValues]="initialValues"
   (ngrxSubmit)="onSubmit($event)"
 >
   <div>
     <h2>Query Form</h2>
     <div>
       <input
-      ngrxField="name"
-      [ngrxInitialValue]="initialValues.name"
-      placeholder="Name"
+        ngrxField="name"
+        placeholder="Name"
       />
     </div>
     <div>
       <input
-      ngrxField="age"
-      [ngrxInitialValue]="initialValues.age"
-      placeholder="Age"
-      type="number"
+        ngrxField="age"
+        placeholder="Age"
+        type="number"
       />
     </div>
     <div>
       <select
         ngrxField="colour"
       >
-        <option value="red">Red</option>
-        <option value="blue">Blue</option>
-        <option value="green">Green</option>
+        <option *ngFor="let colour of colours" [value]="colour">{{colour | titlecase}}</option>
       </select>
     </div>
     <div>
       <label>Male</label>
       <input
-      ngrxField="gender"
-      name="gender"
-      type="radio"
-      value="male"
+        ngrxField="gender"
+        name="gender"
+        type="radio"
+        value="male"
       />
     </div>
     <div>

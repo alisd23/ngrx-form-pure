@@ -1,8 +1,7 @@
-import { Directive, OnInit, Input, Output, HostListener, EventEmitter } from '@angular/core';
+import { Directive, OnInit, Input, Output, HostListener, EventEmitter, AfterContentInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/take';
 
 import { IFormState } from '../types';
 import { getFormActions, FormActions, ActionConstants } from '../actions';
@@ -12,13 +11,13 @@ import { IFieldValidators } from '../validation';
 @Directive({
   selector: '[ngrxForm]'
 })
-export class FormDirective implements OnInit {
+export class FormDirective implements OnInit, AfterContentInit {
   @Input('ngrxForm') private _name: string;
   @Input('ngrxFieldValidators') private _fieldValidators?: IFieldValidators<any>;
+  @Input('ngrxInitialValues') private _initialValues?: any;
   @Output('ngrxSubmit') private _submit = new EventEmitter();
   
-  private _submitEvent$ = new EventEmitter<Event>();
-  private _formState$: Observable<IFormState<any>>
+  private _formState: IFormState<any>;
   private _actions$: Actions;
   private _formActions: FormActions<any, any>;
   private _store: Store<any>;
@@ -33,8 +32,11 @@ export class FormDirective implements OnInit {
 
   @HostListener('submit', ['$event'])
   onSubmit(event: Event) {
+    // When a submit event fires, grab the most recent form values then emit
+    // the submit output event to the parent component
     event.preventDefault();
-    this._submitEvent$.next(event);
+    const values = getFormValues(this._formState);
+    this._submit.emit(values)
   }
 
   public get formName() { return this._name; }
@@ -82,19 +84,11 @@ export class FormDirective implements OnInit {
 
     // Initialise form state
     this._store.dispatch(this._formActions.initForm());
-    
-    this._formState$ = this._store
-      .select('forms')
-      .select(this._name);
 
-    // When a submit event fires, grab the most recent form state then emit
-    // the submit output event to the parent component
-    this._submitEvent$
-      .withLatestFrom(
-        this._formState$,
-        (event, form) => getFormValues(form)
-      )
-      .subscribe(values => this._submit.emit(values));
+    this._store
+      .select('forms')
+      .select(this._name)
+      .subscribe(formState => this._formState = formState);
 
     // When fields state updates and when form initialises - perform field validation
     const errorCheckActionTypes = [
@@ -104,10 +98,15 @@ export class FormDirective implements OnInit {
 
     this._actions$
       .filter(action => errorCheckActionTypes.indexOf(action.type) !== -1)
-      .withLatestFrom(
-        this._formState$,
-        (action, state) => ({ action, state })  
+      .subscribe(() => this.updateFieldErrors(this._formState));    
+  }
+
+  // Called after the child directives (and therefore all field directives) have initialised
+  ngAfterContentInit() {
+    if (this._initialValues) {
+      this._store.dispatch(
+        this._formActions.setInitialValues(this._initialValues)
       )
-      .subscribe(({ state }) => this.updateFieldErrors(state));    
+    }
   }
 }
