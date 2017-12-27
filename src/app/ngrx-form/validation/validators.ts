@@ -8,5 +8,5 @@ export type IFieldValidators<FormShape> = {
 
 export const validators = {
   required: (fieldName: string): IFieldValidator<any> =>
-    (value) => value === undefined ? `${fieldName} is required` : undefined
+    (value) => (value === undefined || value === '') ? `${fieldName} is required` : undefined
 }

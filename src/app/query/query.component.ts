@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
-import { AppState, AppFormState, QueryFormShape } from '../app-store.module';
-import { getFormActions, IFieldValidators, validators } from '../ngrx-form';
-import { Colours } from '../types';
+import { AppFormState, QueryFormShape, AppState } from '../app-store.module';
+import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormState, IFieldErrors } from '../ngrx-form';
+import { Colours, Sexes, Hobbies } from '../types';
 
 const queryFormActions = getFormActions<AppFormState>('query');
 
@@ -13,26 +12,52 @@ const queryFormActions = getFormActions<AppFormState>('query');
   styleUrls: ['./query.component.css']
 })
 export class QueryComponent {
-  private _queryForm: Observable<AppFormState['query']>;
-  
   public colours = Object.keys(Colours);
+  public sexes = Object.keys(Sexes);
+  public hobbies = Object.keys(Hobbies);
+  
+  public store: Store<AppState>;
+  
+  formState: IFormState<QueryFormShape>;
+
+  get fieldErrors(): IFieldErrors<QueryFormShape> {
+    return getFieldErrors(this.formState);  
+  }
 
   initialValues: Partial<QueryFormShape> = {
     name: 'Alex',
     age: '23',
-    colour: Colours.green
-
+    colour: Colours.green,
+    hobbies: []
   }
+
   fieldValidators: IFieldValidators<QueryFormShape> = {
     name: [validators.required('Name')],
     age: [validators.required('Age')]
   };
 
-  constructor(private store: Store<AppState>) {
-    this._queryForm = this.store.select('forms').select('query');
-    this._queryForm.subscribe(() => {});
+  constructor(store: Store<AppState>) {
+    this.store = store;
+    this.store
+      .select('forms', 'query')
+      .subscribe(state => this.formState = state);
+  }
 
-    console.log(Object.keys(Colours));
+  isHobbyChecked = (hobby: Hobbies) => (hobbies: Hobbies[]) => {
+    return hobbies && hobbies.indexOf(hobby) !== -1;
+  }
+
+  onHobbyChange = (hobby: Hobbies) => (checked: boolean, e: Event): QueryFormShape['hobbies'] => {
+    const currentState = this.formState.fields.hobbies.value;
+    const newState = new Set(currentState);
+
+    if (checked) {
+      newState.add(hobby);
+    } else {
+      newState.delete(hobby);
+    }
+
+    return Array.from(newState);
   }
 
   onSubmit(values: QueryFormShape) {

@@ -1,7 +1,6 @@
 import { Directive, OnInit, Input, Output, HostListener, EventEmitter, AfterContentInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
-import { Observable } from 'rxjs/Observable';
 
 import { IFormState } from '../types';
 import { getFormActions, FormActions, ActionConstants } from '../actions';
@@ -13,8 +12,8 @@ import { IFieldValidators } from '../validation';
 })
 export class FormDirective implements OnInit, AfterContentInit {
   @Input('ngrxForm') private _name: string;
-  @Input('ngrxFieldValidators') private _fieldValidators?: IFieldValidators<any>;
-  @Input('ngrxInitialValues') private _initialValues?: any;
+  @Input('fieldValidators') private _fieldValidators?: IFieldValidators<any>;
+  @Input('initialValues') private _initialValues?: any;
   @Output('ngrxSubmit') private _submit = new EventEmitter();
   
   private _formState: IFormState<any>;
@@ -56,16 +55,19 @@ export class FormDirective implements OnInit, AfterContentInit {
         // Run through validators in order until first validator returns something
         // truthy - the error string.
         for (const validate of validators) {
-          const currentError = state.fields[fieldName].error;
           const newError = validate(state.fields[fieldName].value);
-
+          
           // If the current error (or none) for this field is different from the new calculated
           // error (i.e. the fields error state has changed) then add this to the object
-          if (currentError !== newError) {
-            errorChanged = true;
+          if (newError) {
             errors[fieldName] = newError;
             break;
-          }
+          }          
+        }
+        
+        const currentError = state.fields[fieldName].error;
+        if (currentError !== errors[fieldName]) {
+          errorChanged = true;
         }
       }
     }

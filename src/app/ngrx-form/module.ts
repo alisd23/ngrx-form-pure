@@ -1,19 +1,17 @@
 import { NgModule } from '@angular/core';
-import { BasicFieldDirective, RadioFieldDirective, FormDirective } from './directives';
+import { FieldDirective, FormDirective } from './directives';
 import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
   declarations: [
-    BasicFieldDirective,
-    RadioFieldDirective,
+    FieldDirective,
     FormDirective
   ],
   imports: [
     EffectsModule.forRoot([])
   ],
   exports: [
-    BasicFieldDirective,
-    RadioFieldDirective,
+    FieldDirective,
     FormDirective
   ]
 })

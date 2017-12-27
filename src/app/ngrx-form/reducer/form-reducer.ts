@@ -12,7 +12,7 @@ export function formReducer(
       return {
         name: formName,
         fields: {},
-        hasErrors: false,
+        invalid: false,
       };
     }
     case ActionConstants.SET_INITIAL_VALUES: {
@@ -55,7 +55,7 @@ export function formReducer(
       return {
         ...state,
         // At least one of the fields has a truthy value in the incoming errors obejct
-        hasErrors: Object
+        invalid: Object
           .keys(errors)
           .some(fieldName => Boolean(errors[fieldName])),
         fields

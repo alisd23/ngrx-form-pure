@@ -1,8 +1,7 @@
 <form
   ngrxForm="query"
-  [ngrxFieldValidators]="fieldValidators"
-  [ngrxInitialValues]="initialValues"
-  (ngrxSubmit)="onSubmit($event)"
+  [fieldValidators]="fieldValidators"
+  [initialValues]="initialValues"
 >
   <div>
     <h2>Query Form</h2>
@@ -11,6 +10,7 @@
         ngrxField="name"
         placeholder="Name"
       />
+      <label class="error" *ngIf="fieldErrors.name">{{fieldErrors.name}}</label>
     </div>
     <div>
       <input
@@ -18,32 +18,38 @@
         placeholder="Age"
         type="number"
       />
+      <label class="error" *ngIf="fieldErrors.age">{{fieldErrors.age}}</label>
     </div>
     <div>
-      <select
-        ngrxField="colour"
-      >
+      <select ngrxField="colour">
         <option *ngFor="let colour of colours" [value]="colour">{{colour | titlecase}}</option>
       </select>
+      <label class="error" *ngIf="fieldErrors.colour">{{fieldErrors.colour}}</label>
     </div>
-    <div>
-      <label>Male</label>
+    <h3>Sex</h3>
+    <div *ngFor="let sex of sexes">
+      <label>{{sex | titlecase}}</label>
       <input
-        ngrxField="gender"
-        name="gender"
+        ngrxField="sex"
+        name="sex"
         type="radio"
-        value="male"
+        [value]="sex"
       />
     </div>
+    <label class="error" *ngIf="fieldErrors.sex">{{fieldErrors.sex}}</label>
     <div>
-      <label>Female</label>
-      <input
-        ngrxField="gender"
-        name="gender"
-        type="radio"
-        value="female"
-      />
+      <h3>Hobbies</h3>
+      <div *ngFor="let hobby of hobbies">
+        <label>{{hobby | titlecase}}</label>
+        <input
+          ngrxField="hobbies"
+          [normalizeIn]="isHobbyChecked(hobby)"
+          [normalizeOut]="onHobbyChange(hobby)"
+          type="checkbox"
+        />
+      </div>
     </div>
+    <label class="error" *ngIf="fieldErrors.hobbies">{{fieldErrors.hobbies}}</label>
     <button type="submit">Submit</button>
   </div>
 </form>

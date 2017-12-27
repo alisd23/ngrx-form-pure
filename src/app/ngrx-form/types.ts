@@ -1,3 +1,5 @@
+import { OnDestroy } from '@angular/core';
+
 /**
  * Converts a FormShape type, a mapping of field names to their value types, into
  * a mapping type of field names to IFormFieldState objects.
@@ -29,7 +31,7 @@ export interface IFormState<FormShape> {
   name: string;
   initialValues?: FormShape;
   fields: IFormFields<FormShape>;
-  hasErrors: boolean;
+  invalid: boolean;
 }
 
 /**
@@ -41,6 +43,8 @@ export interface IFormFieldState<V> {
   focus: boolean;
   value: V;
   count: number;
+  // pristine: boolean;
+  // touched: boolean;
 }
 
 /**
@@ -51,3 +55,14 @@ export interface IFormReducerState {
   [id: string]: IFormState<any>;
 }
 
+export interface IFieldInfo {
+  fieldName: string;
+  formName: string;
+  onChange(newValue: any, e: Event): void;
+}
+
+export interface IFieldControl extends OnDestroy {
+  onChange(e: Event): any;
+  onValueUpdate(newValue: any): void;
+  initialise(fieldInfo: IFieldInfo);
+}
