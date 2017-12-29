@@ -16,7 +16,7 @@ export class DefaultFieldControl implements IFieldControl, OnDestroy {
   }
   
   onValueUpdate(newValue: string) {
-    this.element.value = newValue;
+    this.element.value = newValue || '';
   }
 
   initialise(fieldInfo: IFieldInfo) {

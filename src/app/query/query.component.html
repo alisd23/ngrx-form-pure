@@ -1,5 +1,6 @@
 <form
   ngrxForm="query"
+  (ngrxSubmit)="onSubmit($event)"
   [fieldValidators]="fieldValidators"
   [initialValues]="initialValues"
 >
@@ -10,7 +11,9 @@
         ngrxField="name"
         placeholder="Name"
       />
-      <label class="error" *ngIf="fieldErrors.name">{{fieldErrors.name}}</label>
+      <label class="error" *ngIf="showFieldError('name')">
+        {{fieldErrors.name}}
+      </label>
     </div>
     <div>
       <input
@@ -18,25 +21,31 @@
         placeholder="Age"
         type="number"
       />
-      <label class="error" *ngIf="fieldErrors.age">{{fieldErrors.age}}</label>
+      <label class="error" *ngIf="showFieldError('age')">
+        {{fieldErrors.age}}
+      </label>
     </div>
     <div>
       <select ngrxField="colour">
         <option *ngFor="let colour of colours" [value]="colour">{{colour | titlecase}}</option>
       </select>
-      <label class="error" *ngIf="fieldErrors.colour">{{fieldErrors.colour}}</label>
+      <label class="error" *ngIf="showFieldError('colour')">
+        {{fieldErrors.colour}}
+      </label>
     </div>
-    <h3>Sex</h3>
-    <div *ngFor="let sex of sexes">
-      <label>{{sex | titlecase}}</label>
+    <h3>Favourite Band</h3>
+    <div *ngFor="let band of bands">
+      <label>{{getBandName(band) | titlecase}}</label>
       <input
-        ngrxField="sex"
-        name="sex"
+        ngrxField="favouriteBand"
+        name="favouriteBand"
         type="radio"
-        [value]="sex"
+        [value]="band"
       />
     </div>
-    <label class="error" *ngIf="fieldErrors.sex">{{fieldErrors.sex}}</label>
+    <label class="error" *ngIf="showFieldError('favouriteBand')">
+      {{fieldErrors.favouriteBand}}
+    </label>
     <div>
       <h3>Hobbies</h3>
       <div *ngFor="let hobby of hobbies">
@@ -49,7 +58,17 @@
         />
       </div>
     </div>
-    <label class="error" *ngIf="fieldErrors.hobbies">{{fieldErrors.hobbies}}</label>
-    <button type="submit">Submit</button>
+    <label class="error" *ngIf="showFieldError('hobbies')">
+      {{fieldErrors.hobbies}}
+    </label>
+    <button
+      type="submit"
+      [disabled]="formState.invalid"
+    >
+      Submit
+    </button>
+    <div *ngIf="loading">
+      ...LOADING...
+    </div>
   </div>
 </form>

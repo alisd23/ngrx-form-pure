@@ -1,6 +1,7 @@
-import { Directive, Input, OnInit, OnDestroy, Host, HostListener, Injector } from '@angular/core';
+import { Directive, Input, OnInit, OnDestroy, HostListener, Injector } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getFormActions, FormActions } from '../actions';
+import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/filter';
 
 import { FormDirective } from './form-directive';
@@ -24,14 +25,18 @@ export class FieldDirective implements OnInit, OnDestroy {
   @Input('stateMutator') stateMutator: (value: any, e: Event) => any;
   @Input('valueMutator') valueMutator: (value) => any;
 
+  private initialized = false;
   private fieldValue: any;
   private formActions: FormActions<any, any>;
   private fieldControl: IFieldControl;
+  private subscriptions: Subscription[] = [];
 
   private get formName() { return this.formDirective.formName; }
 
   constructor(
-    @Host() private formDirective: FormDirective,
+    // Angular DI will look up the heirarchy until the first FormDirective instance is found
+    // which should be the parent form
+    private formDirective: FormDirective,
     private store: Store<any>,
     private injector: Injector,
   ) {}
@@ -71,23 +76,34 @@ export class FieldDirective implements OnInit, OnDestroy {
       get fieldName() { return this.fieldName },
       onChange: (value, e) => this.onChange(value, e)
     });
-      
+
     this.store.dispatch(
       this.formActions.registerField(this.fieldName)
-    );
+    )
 
-    this.store
+    const storeSubscription = this.store
       .select('forms', this.formName, 'fields', this.fieldName, 'value')
       .subscribe((value) => {
         const newValue = this.valueMutator ? this.valueMutator(value) : value;
         this.fieldValue = newValue;
         this.fieldControl.onValueUpdate(newValue);
       });
+
+    this.subscriptions.push(storeSubscription);
+    this.initialized = true;
   }
 
   ngOnDestroy() {
     if (this.fieldControl) {
       this.fieldControl.ngOnDestroy();
+    }
+
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+
+    if (this.initialized) {
+      this.store.dispatch(
+        this.formActions.unregisterField(this.fieldName)
+      );
     }
   }
 }

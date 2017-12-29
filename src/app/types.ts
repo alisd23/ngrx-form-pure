@@ -4,9 +4,9 @@ export enum Colours {
   green = 'green'
 }
 
-export enum Sexes {
-  male = 'male',
-  female = 'female'
+export enum Bands {
+  smashMouth = 'smash mouth',
+  bagRaiders = 'bag raiders'
 }
 
 export enum Hobbies {

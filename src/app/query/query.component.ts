@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppFormState, QueryFormShape, AppState } from '../app-store.module';
 import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormState, IFieldErrors } from '../ngrx-form';
-import { Colours, Sexes, Hobbies } from '../types';
+import { Colours, Bands, Hobbies } from '../types';
 
 const queryFormActions = getFormActions<AppFormState>('query');
 
@@ -13,19 +13,15 @@ const queryFormActions = getFormActions<AppFormState>('query');
 })
 export class QueryComponent {
   public colours = Object.keys(Colours);
-  public sexes = Object.keys(Sexes);
+  public bands = Object.keys(Bands);
   public hobbies = Object.keys(Hobbies);
   
   public store: Store<AppState>;
+  public loading = false;
   
   formState: IFormState<QueryFormShape>;
 
-  get fieldErrors(): IFieldErrors<QueryFormShape> {
-    return getFieldErrors(this.formState);  
-  }
-
   initialValues: Partial<QueryFormShape> = {
-    name: 'Alex',
     age: '23',
     colour: Colours.green,
     hobbies: []
@@ -33,7 +29,9 @@ export class QueryComponent {
 
   fieldValidators: IFieldValidators<QueryFormShape> = {
     name: [validators.required('Name')],
-    age: [validators.required('Age')]
+    age: [validators.required('Age')],
+    colour: [validators.required('Colour')],
+    favouriteBand: [validators.required('Favourite band')],
   };
 
   constructor(store: Store<AppState>) {
@@ -41,6 +39,23 @@ export class QueryComponent {
     this.store
       .select('forms', 'query')
       .subscribe(state => this.formState = state);
+  }
+
+  get fieldErrors(): IFieldErrors<QueryFormShape> {
+    return getFieldErrors(this.formState);  
+  }
+
+  getBandName(band: Bands) {
+    return Bands[band];
+  }
+
+  showFieldError(fieldName: keyof QueryFormShape) {
+    const isFieldTouched = (
+      this.formState.fields[fieldName] &&
+      this.formState.fields[fieldName].touched
+    ) || false;
+    const hasError = this.fieldErrors[fieldName];
+    return isFieldTouched && hasError;
   }
 
   isHobbyChecked = (hobby: Hobbies) => (hobbies: Hobbies[]) => {
@@ -62,6 +77,14 @@ export class QueryComponent {
 
   onSubmit(values: QueryFormShape) {
     console.log('Submitted', values);
+    this.loading = true;
+    setTimeout(
+      () => {
+        this.loading = false;
+        console.log('Submit success')
+      },
+      2000
+    )
   }
 
   onReset() {

@@ -61,6 +61,27 @@ export function formReducer(
         fields
       };
     }
+    case ActionConstants.UNREGISTER_FIELD: {
+      const { fieldName } = action.payload;
+      if (state.fields[fieldName].count <= 1) {
+        const newState = {
+          ...state,
+          fields: {
+            ...state.fields
+          }
+        }
+        delete newState.fields[fieldName];
+        return newState;
+      } else {
+        return {
+          ...state,
+          fields: {
+            ...state.fields,
+            [fieldName]: fieldReducer(state.fields[fieldName], action)
+          }
+        };
+      }
+    }
     case ActionConstants.CHANGE:
     case ActionConstants.FOCUS:
     case ActionConstants.REGISTER_FIELD:

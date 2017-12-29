@@ -13,6 +13,7 @@ export enum ActionConstants {
   CHANGE = '@ngrx-form/change',
   UPDATE_FIELD_ERRORS = '@ngrx-form/update-field-errors',
   REGISTER_FIELD = '@ngrx-form/register-field',
+  UNREGISTER_FIELD = '@ngrx-form/unregister-field',
   SET_INITIAL_VALUES = '@ngrx-form/set-initial-values'
 }
 
@@ -23,7 +24,7 @@ interface InitFormAction<RootState> extends Action {
   };
 }
 
-interface DestroyAction<RootState> extends Action {
+interface DestroyFormAction<RootState> extends Action {
   type: ActionConstants.DESTROY;
   payload: { formName: keyof RootState };
 }
@@ -69,6 +70,14 @@ interface RegisterFieldAction<RootState, FormShape> extends Action {
   }
 }
 
+interface UnregisterFieldAction<RootState, FormShape> extends Action {
+  type: ActionConstants.UNREGISTER_FIELD;
+  payload: {
+    formName: keyof RootState;
+    fieldName: keyof FormShape;
+  }
+}
+
 interface SetInitialValuesAction<RootState, FormShape> extends Action {
   type: ActionConstants.SET_INITIAL_VALUES;
   payload: {
@@ -79,12 +88,13 @@ interface SetInitialValuesAction<RootState, FormShape> extends Action {
 
 export type Actions<S extends IFormReducerState, F extends IFormState<any>> =
   InitFormAction<S> |
-  DestroyAction<S> |
+  DestroyFormAction<S> |
   FocusFieldAction<S, F> |
   BlurFieldAction<S, F> |
   ChangeFieldAction<S, F> |
   UpdateFieldErrors<S, F> |
   RegisterFieldAction<S, F> |
+  UnregisterFieldAction<S, F> |
   SetInitialValuesAction<S, F>;
 
   
@@ -96,7 +106,7 @@ export interface FormActions<RootState, FormShape> {
   initForm: () =>
     InitFormAction<RootState>;
   destroyForm: () =>
-    DestroyAction<RootState>;
+    DestroyFormAction<RootState>;
   focusField: (fieldName: keyof FormShape) =>
     FocusFieldAction<RootState, FormShape>;
   blurField: (fieldName: keyof FormShape) =>
@@ -107,6 +117,8 @@ export interface FormActions<RootState, FormShape> {
     UpdateFieldErrors<RootState, FormShape>
   registerField: (fieldName: keyof FormShape) =>
     RegisterFieldAction<RootState, FormShape>;
+  unregisterField: (fieldName: keyof FormShape) =>
+    UnregisterFieldAction<RootState, FormShape>;
   setInitialValues: (values: FormShape) =>
     SetInitialValuesAction<RootState, FormShape>;
 }
@@ -141,6 +153,10 @@ export function getFormActions<RootShape extends any>(formName: keyof RootShape)
     }),
     registerField: (fieldName) => ({
       type: ActionConstants.REGISTER_FIELD,
+      payload: { formName, fieldName }
+    }),
+    unregisterField: (fieldName) => ({
+      type: ActionConstants.UNREGISTER_FIELD,
       payload: { formName, fieldName }
     }),
     setInitialValues: (values) => ({

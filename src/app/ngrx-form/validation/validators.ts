@@ -1,12 +1,6 @@
-export type IFieldValidator<V> = {
-  (value: V): string | undefined;
-}
-
-export type IFieldValidators<FormShape> = {
-  [Field in keyof FormShape]?: IFieldValidator<FormShape[Field]>[];
-}
+import { IFieldValidator } from '../types';
 
 export const validators = {
-  required: (fieldName: string): IFieldValidator<any> =>
+  required: (fieldName: string): IFieldValidator<any, any> =>
     (value) => (value === undefined || value === '') ? `${fieldName} is required` : undefined
 }
