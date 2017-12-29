@@ -44,7 +44,7 @@ export interface IFormFieldState<V> {
   value: V;
   count: number;
   // pristine: boolean;
-  // touched: boolean;
+  touched: boolean;
 }
 
 /**

@@ -43,8 +43,8 @@
         <label>{{hobby | titlecase}}</label>
         <input
           ngrxField="hobbies"
-          [normalizeIn]="isHobbyChecked(hobby)"
-          [normalizeOut]="onHobbyChange(hobby)"
+          [valueMutator]="isHobbyChecked(hobby)"
+          [stateMutator]="onHobbyChange(hobby)"
           type="checkbox"
         />
       </div>

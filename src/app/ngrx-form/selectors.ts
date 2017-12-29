@@ -18,3 +18,13 @@ export function getFieldErrors<FormShape>(formState: IFormState<FormShape>): IFi
       [fieldName]: formState.fields[fieldName].error
     }), {});
 }
+
+export function isFormPristine<FormShape>(formState: IFormState<FormShape>): boolean {
+  const fieldNames = Object.keys(formState.fields) as (keyof FormShape)[];
+  for (const name of fieldNames) {
+    if (formState.fields[name].value !== formState.initialValues[name]) {
+      return false
+    }
+  }
+  return true;
+}

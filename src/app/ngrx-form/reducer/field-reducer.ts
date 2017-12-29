@@ -4,6 +4,7 @@ import { Actions, ActionConstants } from '../actions';
 const initialState: IFormFieldState<any> = {
   value: undefined,
   focus: false,
+  touched: false,
   error: undefined,
   count: 0
 }
@@ -34,7 +35,8 @@ export function fieldReducer(
     case ActionConstants.BLUR: {
       return {
         ...state,
-        focus: false
+        focus: false,
+        touched: true
       };
     }
     default: {

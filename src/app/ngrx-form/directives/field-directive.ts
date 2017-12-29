@@ -21,8 +21,8 @@ export class FieldDirective implements OnInit, OnDestroy {
   @Input('ngrxField') fieldName: string;
   @Input('name') name: string;
   @Input('type') type: string;
-  @Input('normalizeOut') normalizeOut: (value: any, e: Event) => any;
-  @Input('normalizeIn') normalizeIn: (value) => any;
+  @Input('stateMutator') stateMutator: (value: any, e: Event) => any;
+  @Input('valueMutator') valueMutator: (value) => any;
 
   private fieldValue: any;
   private formActions: FormActions<any, any>;
@@ -53,7 +53,7 @@ export class FieldDirective implements OnInit, OnDestroy {
       this.store.dispatch(
         this.formActions.changeField(
           this.fieldName,
-          this.normalizeOut ? this.normalizeOut(newValue, e) : newValue
+          this.stateMutator ? this.stateMutator(newValue, e) : newValue
         )
       );
     }
@@ -72,12 +72,14 @@ export class FieldDirective implements OnInit, OnDestroy {
       onChange: (value, e) => this.onChange(value, e)
     });
       
-    this.formActions.registerField(this.fieldName);
+    this.store.dispatch(
+      this.formActions.registerField(this.fieldName)
+    );
 
     this.store
       .select('forms', this.formName, 'fields', this.fieldName, 'value')
       .subscribe((value) => {
-        const newValue = this.normalizeIn ? this.normalizeIn(value) : value;
+        const newValue = this.valueMutator ? this.valueMutator(value) : value;
         this.fieldValue = newValue;
         this.fieldControl.onValueUpdate(newValue);
       });
