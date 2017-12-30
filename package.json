@@ -14,11 +14,11 @@
     "npm": ">= 3.0.0"
   },
   "scripts": {
-    "clean": "rimraf out-tsc dist/*",
+    "clean": "rimraf out-tsc dist/* src/lib/**/*.js src/lib/**/*.js.map src/demo/app/**/*.js src/demo/app/**/*.js.map",
     "prebuild": "npm run clean",
     "build": "node build.js",
-    "build-demo": "tsc -p src/demo/",
-    "build-demo:watch": "tsc -p src/demo/ -w",
+    "build-demo": "tsc -p src/demo/ --outDir dist",
+    "build-demo:watch": "tsc -p src/demo/ --outDir dist -w",
     "serve": "lite-server -c=bs-config.json",
     "prestart": "npm run build-demo",
     "start": "concurrently \"npm run build-demo:watch\" \"npm run serve\"",
