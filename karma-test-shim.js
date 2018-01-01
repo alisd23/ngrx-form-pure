@@ -39,7 +39,7 @@ System.config({
     'npm:': 'node_modules/'
   },
   // Base URL for System.js calls. 'base/' is where Karma serves files from.
-  baseURL: 'base/src/lib',
+  baseURL: 'base/dist/lib',
   // Extend usual application package list with test folder
   packages: {
     rxjs: { defaultExtension: 'js' },
@@ -49,6 +49,14 @@ System.config({
     },
     '': { defaultExtension: 'js' },
     src: {
+        defaultExtension: 'js',
+        meta: {
+          './*.js': {
+            loader: 'system-loader'
+          }
+        }
+      },
+    dist: {
         defaultExtension: 'js',
         meta: {
           './*.js': {
@@ -78,7 +86,12 @@ System.config({
     '@angular/router/testing': 'npm:@angular/router/bundles/router-testing.umd.js',
     '@angular/forms/testing': 'npm:@angular/forms/bundles/forms-testing.umd.js',
     'rxjs': 'npm:rxjs',
-    'src': 'src'
+    '@ngrx/store': 'npm:@ngrx/store/bundles/store.umd.js',
+    '@ngrx/effects': 'npm:@ngrx/effects/bundles/effects.umd.js',
+    'ngrx-store-logger': 'npm:ngrx-store-logger/dist/index.js',
+    'immer': 'npm:immer/immer.js',
+    'src': 'src',
+    'dist': 'dist'
   }
 });
 

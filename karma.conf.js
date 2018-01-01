@@ -1,6 +1,7 @@
 module.exports = function (config) {
 
-  var libBase = 'src/lib/';       // transpiled app JS and map files
+  var srcBase = 'src/lib/';
+  var distBase = 'dist/lib/';       // transpiled app JS and map files
 
   config.set({
     basePath: '',
@@ -13,7 +14,7 @@ module.exports = function (config) {
     ],
 
     client: {
-      builtPaths: [libBase], // add more spec base paths as needed
+      builtPaths: [distBase], // add more spec base paths as needed
       clearContext: false // leave Jasmine Spec Runner output visible in browser
     },
 
@@ -51,28 +52,33 @@ module.exports = function (config) {
       { pattern: 'node_modules/@angular/**/*.js', included: false, watched: false },
       { pattern: 'node_modules/@angular/**/*.js.map', included: false, watched: false },
 
+      { pattern: 'node_modules/@ngrx/**/*.js', included: false, watched: false },
+      { pattern: 'node_modules/@ngrx/**/*.js.map', included: false, watched: false },
+      { pattern: 'node_modules/immer/**/*.js', included: false, watched: false },
+
+
       { pattern: 'src/demo/systemjs-angular-loader.js', included: false, watched: false },
 
       'karma-test-shim.js', // optionally extend SystemJS mapping e.g., with barrels
 
       // transpiled application & spec code paths loaded via module imports
-      { pattern: libBase + '**/*.js', included: false, watched: true },
+      { pattern: distBase + '**/*.js', included: false, watched: true },
 
       // Asset (HTML & CSS) paths loaded via Angular's component compiler
       // (these paths need to be rewritten, see proxies section)
-      { pattern: libBase + '**/*.html', included: false, watched: true },
-      { pattern: libBase + '**/*.css', included: false, watched: true },
+      { pattern: srcBase + '**/*.html', included: false, watched: true },
+      { pattern: srcBase + '**/*.css', included: false, watched: true },
 
       // Paths for debugging with source maps in dev tools
-      { pattern: libBase + '**/*.ts', included: false, watched: false },
-      { pattern: libBase + '**/*.js.map', included: false, watched: false }
+      { pattern: srcBase + '**/*.ts', included: false, watched: false },
+      { pattern: distBase + '**/*.js.map', included: false, watched: false },
     ],
 
     // Proxied base paths for loading assets
     proxies: {
       // required for modules fetched by SystemJS
-      '/base/src/lib/node_modules/': '/base/node_modules/',
-      '/base/src/lib/demo/': '/base/src/demo/'
+      '/base/dist/lib/node_modules/': '/base/node_modules/',
+      '/base/dist/lib/demo/': '/base/src/demo/'
     },
 
     exclude: [],

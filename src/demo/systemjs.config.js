@@ -27,7 +27,8 @@
       'rxjs': 'npm:rxjs',
       '@ngrx/store': 'npm:@ngrx/store/bundles/store.umd.js',
       '@ngrx/effects': 'npm:@ngrx/effects/bundles/effects.umd.js',
-      'ngrx-store-logger': 'npm:ngrx-store-logger/dist/index.js'
+      'ngrx-store-logger': 'npm:ngrx-store-logger/dist/index.js',
+      'immer': 'npm:immer/immer.js'
     },
     // packages tells the System loader how to load when no filename and/or no extension
     packages: {

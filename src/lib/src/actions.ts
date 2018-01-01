@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { IFormReducerState, IFormState, IFieldErrors } from './types/index';
+import { IFormReducerState, IFormState, IFieldErrors, IFormValues } from './types/index';
 
 // ========================= //
 //        ACTION TYPES       //
@@ -119,13 +119,13 @@ export interface FormActions<RootState, FormShape> {
     RegisterFieldAction<RootState, FormShape>;
   unregisterField: (fieldName: keyof FormShape) =>
     UnregisterFieldAction<RootState, FormShape>;
-  setInitialValues: (values: FormShape) =>
+  setInitialValues: (values: Partial<FormShape>) =>
     SetInitialValuesAction<RootState, FormShape>;
 }
 
 // Create actions given form shape (Makes Typings work nicely)
-export function getFormActions<RootShape extends any>(formName: keyof RootShape):
-  FormActions<RootShape, RootShape[keyof RootShape]> {
+export function getFormActions<RootFormsState extends any>(formName: keyof RootFormsState):
+  FormActions<RootFormsState, IFormValues<RootFormsState[keyof RootFormsState]>> {
   return {
     initForm: () => ({
       type: ActionConstants.INIT,
