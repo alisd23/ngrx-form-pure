@@ -7,7 +7,7 @@ export function formReducer(
   action: Actions<IFormReducerState, any>
 ): IFormState<any> {
   switch (action.type) {
-    case ActionConstants.INIT: {
+    case ActionConstants.INIT_FORM: {
       const { formName } = action.payload;
       return {
         name: formName,
@@ -21,9 +21,9 @@ export function formReducer(
       const fieldsState = { ...state.fields };
 
       for (const name of fieldNames) {
-        // Reuse CHANGE action in field reducer to set field value to the initial value
+        // Reuse CHANGE_FIELD action in field reducer to set field value to the initial value
         fieldsState[name] = fieldReducer(state.fields[name], {
-          type: ActionConstants.CHANGE,
+          type: ActionConstants.CHANGE_FIELD,
           payload: {
             formName,
             fieldName: name,
@@ -82,10 +82,10 @@ export function formReducer(
         };
       }
     }
-    case ActionConstants.CHANGE:
-    case ActionConstants.FOCUS:
+    case ActionConstants.CHANGE_FIELD:
+    case ActionConstants.FOCUS_FIELD:
     case ActionConstants.REGISTER_FIELD:
-    case ActionConstants.BLUR: {
+    case ActionConstants.BLUR_FIELD: {
       const { fieldName } = action.payload;
       return {
         ...state,

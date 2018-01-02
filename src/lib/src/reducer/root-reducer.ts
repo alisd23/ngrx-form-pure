@@ -7,21 +7,20 @@ export function rootReducer(
   action: Actions<IFormReducerState, any>
 ): IFormReducerState {
   switch (action.type) {
-    case ActionConstants.DESTROY: {
+    case ActionConstants.DESTROY_FORM: {
       const { formName } = action.payload;
-      return {
-        ...state,
-        [formName]: undefined
-      };
+      const newState = { ...state };
+      delete newState[formName];
+      return newState;
     }
-    case ActionConstants.INIT:
+    case ActionConstants.INIT_FORM:
     case ActionConstants.REGISTER_FIELD:
     case ActionConstants.UNREGISTER_FIELD:
     case ActionConstants.UPDATE_FIELD_ERRORS:
     case ActionConstants.SET_INITIAL_VALUES:
-    case ActionConstants.FOCUS:
-    case ActionConstants.BLUR:
-    case ActionConstants.CHANGE: {
+    case ActionConstants.FOCUS_FIELD:
+    case ActionConstants.BLUR_FIELD:
+    case ActionConstants.CHANGE_FIELD: {
       const { formName } = action.payload;
       return {
         ...state,

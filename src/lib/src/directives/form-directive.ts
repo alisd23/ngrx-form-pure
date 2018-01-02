@@ -93,8 +93,8 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
 
     // When fields state updates and when form initialises - perform field validation
     const errorCheckActionTypes = [
-      ActionConstants.CHANGE,
-      ActionConstants.INIT
+      ActionConstants.CHANGE_FIELD,
+      ActionConstants.INIT_FORM
     ] as string[];
 
     const actionSubscription = this.actions$

@@ -18,7 +18,7 @@ export type IFormReducerState = {
  * Converts a form state type to a mapping of form fields to value types
  */
 export type IFormValues<FormState extends IFormState<any, any>> = {
-  [Field in keyof FormState['fields']]?: FormState['fields'][Field]['value'];
+  [Field in keyof FormState['fields']]: FormState['fields'][Field]['value'];
 }
 
 /**

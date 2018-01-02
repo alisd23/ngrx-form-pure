@@ -20,19 +20,25 @@ export function fieldReducer(
         count: state.count ? (state.count + 1) : 1
       };
     }
-    case ActionConstants.CHANGE: {
+    case ActionConstants.UNREGISTER_FIELD: {
+      return {
+        ...state,
+        count: state.count - 1
+      } 
+    }
+    case ActionConstants.CHANGE_FIELD: {
       return {
         ...state,
         value: action.payload.value
       }
     }
-    case ActionConstants.FOCUS: {
+    case ActionConstants.FOCUS_FIELD: {
       return {
         ...state,
         focus: true
       };
     }
-    case ActionConstants.BLUR: {
+    case ActionConstants.BLUR_FIELD: {
       return {
         ...state,
         focus: false,

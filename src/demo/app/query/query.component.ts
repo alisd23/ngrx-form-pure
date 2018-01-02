@@ -92,6 +92,6 @@ export class QueryComponent {
   }
 }
 
-// ON FIELD CHANGE
+// ON FIELD CHANGE_FIELD
 // - Show field error when field is wrong and field is "dirty"
 // - Show overall form error (maybe?) 
