@@ -1,0 +1,10 @@
+<div class="multiselect">
+  <div
+    *ngFor="let option of options"
+    class="multiselect-item"
+    [class.selected]="isOptionSelected(option)"
+    (click)="onOptionSelected(option)"
+  >
+    <span>{{option | titlecase}}</span>
+  </div>
+</div>

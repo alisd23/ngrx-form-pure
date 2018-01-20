@@ -1,0 +1,21 @@
+.multiselect {
+  border: 1px solid #ddd;
+  
+  .multiselect-item {
+    padding: 6px 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
+
+    &.selected {
+      background-color: lightcoral;
+      color: white;
+
+      &:hover {
+        background-color: darken(lightcoral, 5);
+      }
+    }
+  }
+}

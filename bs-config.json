@@ -1,9 +1,0 @@
-{
-  "server": {
-    "baseDir": ["src/demo", "dist/demo"],
-    "routes": {
-      "/node_modules": "node_modules",
-      "/ngrx-form": "dist/lib"
-    }
-  }
-}

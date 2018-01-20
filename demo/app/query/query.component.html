@@ -1,0 +1,104 @@
+<form
+  ngrxForm="query"
+  (ngrxSubmit)="onSubmit($event)"
+  [fieldValidators]="fieldValidators"
+  [initialValues]="initialValues"
+>
+  <div>
+    <h2>Query Form</h2>
+    
+    <!-- Name string input -->
+    <h3>Name</h3>
+    <div>
+      <input
+        ngrxField="name"
+        placeholder="Name"
+      />
+      <label class="error" *ngIf="showFieldError('name')">
+        {{fieldErrors.name}}
+      </label>
+    </div>
+    
+    <!-- Age number input -->
+    <h3>Age</h3>
+    <div>
+      <input
+        ngrxField="age"
+        placeholder="Age"
+        type="number"
+      />
+      <label class="error" *ngIf="showFieldError('age')">
+        {{fieldErrors.age}}
+      </label>
+    </div>
+
+    <!-- Colours select dropdown -->
+    <h3>Favourite Colour</h3>
+    <div>
+      <select ngrxField="colour">
+        <option *ngFor="let colour of colours" [value]="colour">{{colour | titlecase}}</option>
+      </select>
+      <label class="error" *ngIf="showFieldError('colour')">
+        {{fieldErrors.colour}}
+      </label>
+    </div>
+
+    <!-- Bands radio button group -->
+    <h3>Favourite Band</h3>
+    <div *ngFor="let band of bands">
+      <label>{{getBandName(band) | titlecase}}</label>
+      <input
+        ngrxField="favouriteBand"
+        name="favouriteBand"
+        type="radio"
+        [value]="band"
+      />
+    </div>
+    <label class="error" *ngIf="showFieldError('favouriteBand')">
+      {{fieldErrors.favouriteBand}}
+    </label>
+
+    <!-- Hobbies checkbox group  -->
+    <div>
+      <h3>Hobbies</h3>
+      <div *ngFor="let hobby of hobbies">
+        <label>{{hobby | titlecase}}</label>
+        <input
+          ngrxField="hobbies"
+          [valueMutator]="isHobbyChecked(hobby)"
+          [stateMutator]="onHobbyChange(hobby)"
+          type="checkbox"
+        />
+      </div>
+    </div>
+    <label class="error" *ngIf="showFieldError('hobbies')">
+      {{fieldErrors.hobbies}}
+    </label>
+
+    <!-- Custom "genres" multiselect component -->
+    <h3>Music genres</h3>
+    <app-genre-multiselect></app-genre-multiselect>
+
+    <!-- Terms & conditions checkbox -->
+    <h3>Accept terms &amp; conditions?</h3>
+    <div>
+      <input
+        ngrxField="terms"
+        type="checkbox"
+      />
+      <label class="error" *ngIf="showFieldError('terms')">
+        {{fieldErrors.terms}}
+      </label>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="formState.invalid"
+    >
+      Submit
+    </button>
+    <div *ngIf="loading">
+      ...LOADING...
+    </div>
+  </div>
+</form>

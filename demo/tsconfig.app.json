@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.json",
+  "angularCompilerOptions": {
+    "paths": {
+      "ngrx-form": [ "../src/index.ts" ]
+    }
+  },
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "module": "es2015",
+    "baseUrl": "",
+    "types": [],
+    "paths": {
+      "ngrx-form": [ "../src/index.ts" ]
+    }
+  },
+  "files": [
+    "main.ts"
+  ]
+}
