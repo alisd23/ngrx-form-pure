@@ -9,7 +9,7 @@ import {
 } from '../index';
 
 import { TestComponent } from './util/test.component';
-import { TestAction, FORM_NAME } from './util/types';
+import { ITestAction, FORM_NAME } from './util/types';
 import { setup } from './util/setup';
 import { StoreMock } from './mock/store-mock';
 
@@ -18,7 +18,7 @@ describe('Field directive [ngrxField]', () => {
   let store: StoreMock;
   let fixture: ComponentFixture<TestComponent>;
   let debugElement: DebugElement;
-  let actions$: Subject<TestAction>;
+  let actions$: Subject<ITestAction>;
 
   beforeEach(async(() => {
     actions$ = new Subject();
@@ -42,14 +42,14 @@ describe('Field directive [ngrxField]', () => {
     const dispatchSpy = spyOn(store, 'dispatch');
     fixture.detectChanges();
 
-    const nameRegisterAction: TestAction = {
+    const nameRegisterAction: ITestAction = {
       type: ActionConstants.REGISTER_FIELD,
       payload: {
         formName: FORM_NAME,
         fieldName: 'name'
       }
     };
-    const ageRegisterAction: TestAction = {
+    const ageRegisterAction: ITestAction = {
       type: ActionConstants.REGISTER_FIELD,
       payload: {
         formName: FORM_NAME,

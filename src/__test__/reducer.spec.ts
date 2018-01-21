@@ -1,9 +1,9 @@
 import { formReducer, getFormActions, IFormFieldState, IFieldErrors } from '../index';
 import immer from 'immer';
 
-import { TestFormShape, RootState } from './util/types';
+import { ITestFormShape, IRootState } from './util/types';
 
-type RootFormsState = RootState['form'];
+type RootFormsState = IRootState['form'];
 
 const TEST_FORM_NAME = 'test';
 
@@ -74,7 +74,7 @@ describe('reducer', () => {
   // Set intitial field values
   describe('SET_INITIAL_VALUES action', () => {
     it('Sets values correctly', () => {
-      const values: Partial<TestFormShape> = {
+      const values: Partial<ITestFormShape> = {
         name: 'John'
       }
       const expected: RootFormsState = immer(state, draftState => {
@@ -90,7 +90,7 @@ describe('reducer', () => {
   // Update field errors
   describe('UPDATE_FIELD_ERRORS action', () => {
     it('Sets state correctly when errors exist', () => {
-      const errors: IFieldErrors<TestFormShape> = {
+      const errors: IFieldErrors<ITestFormShape> = {
         age: 'Age is required'
       };
       const expected: RootFormsState = immer(state, draftState => {

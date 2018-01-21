@@ -2,7 +2,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { TestAction } from '../util/types';
+import { ITestAction } from '../util/types';
 
 import 'rxjs/add/operator/pluck';
 
@@ -28,7 +28,7 @@ export class StoreMock {
     return new StoreMock(this.subject$, this.state$.pluck(...keys));
   }
 
-  dispatch(action: TestAction) {}
+  dispatch(action: ITestAction) {}
 
   subscribe(...args): Subscription {
     return this.state$.subscribe(...args);

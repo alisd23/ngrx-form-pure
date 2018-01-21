@@ -18,10 +18,11 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
 
   @Output('ngrxSubmit') public submit = new EventEmitter();
 
-  private initialized = false;
-  private formState: IFormState<any>;
   private formActions: FormActions<any, any>;
   private subscriptions: Subscription[] = [];
+
+  public initialized = false;
+  public formState: IFormState<any>;
 
   constructor(
     private store: Store<IStoreState>,
