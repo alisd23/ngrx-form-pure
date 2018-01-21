@@ -21,7 +21,8 @@
     }
   },
   "include": [
-    "./polyfills.ts"
+    "./polyfills.ts",
+    "./**/*.ts"
   ],
   "exclude": [
     ".ng_build"

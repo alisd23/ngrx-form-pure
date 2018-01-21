@@ -13,10 +13,10 @@ import { getFormValues } from '../selectors';
 })
 export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   @Input('ngrxForm') public formName: string;
-  @Input('fieldValidators') private fieldValidators?: IFieldValidators<any>;
-  @Input('initialValues') private initialValues?: any;
+  @Input('fieldValidators') public fieldValidators?: IFieldValidators<any>;
+  @Input('initialValues') public initialValues?: any;
 
-  @Output('ngrxSubmit') private submit = new EventEmitter();
+  @Output('ngrxSubmit') public submit = new EventEmitter();
 
   private initialized = false;
   private formState: IFormState<any>;
@@ -29,7 +29,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   ) {}
 
   @HostListener('submit', ['$event'])
-  onSubmit(event: Event) {
+  public onSubmit(event: Event) {
     // When a submit event fires, grab the most recent form values then emit
     // the submit output event to the parent component
     event.preventDefault();
@@ -38,7 +38,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
     this.submit.emit(values)
   }
 
-  updateFieldErrors(state: IFormState<any>) {
+  public updateFieldErrors(state: IFormState<any>) {
     if (!this.fieldValidators) {
       return;
     }
@@ -81,15 +81,14 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
    * After component initialises
    * Set up observable subscriptions (form state, actions, events etc...)
    */
-  ngOnInit() {
+  public ngOnInit() {
     this.formActions = getFormActions(this.formName);
 
     // Initialise form state
     this.store.dispatch(this.formActions.initForm());
 
     const storeSubscription = this.store
-      .select('form')
-      .select(this.formName)
+      .select('form', this.formName)
       .subscribe(formState => this.formState = formState);
 
     // When fields state updates and when form initialises - perform field validation
@@ -107,7 +106,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   }
 
   // Called after the child directives (and therefore all field directives) have initialised
-  ngAfterContentInit() {
+  public ngAfterContentInit() {
     if (this.initialValues) {
       this.store.dispatch(
         this.formActions.setInitialValues(this.initialValues)
@@ -119,7 +118,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
     }
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.subscriptions.forEach(sub => sub.unsubscribe());
 
     if (this.initialized) {
