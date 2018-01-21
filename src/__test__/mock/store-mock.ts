@@ -6,7 +6,6 @@ import { Subscription } from 'rxjs/Subscription';
 import { TestAction } from '../util/types';
 
 import 'rxjs/add/operator/pluck';
-import 'rxjs/add/operator/do';
 
 export class StoreMock {
   // Underlying subject, used for mocking state updates
@@ -19,7 +18,7 @@ export class StoreMock {
     state$?: Observable<any>
   ) {
     this.subject$ = subject$;
-    this.state$ = state$ || subject$.asObservable().do(console.log);
+    this.state$ = state$ || subject$.asObservable();
   }
 
   /**

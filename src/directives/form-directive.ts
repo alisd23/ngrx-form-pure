@@ -39,7 +39,6 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   }
 
   public updateFieldErrors(state: IFormState<any>) {
-    console.log('UPDATE: ', state);
     if (!this.fieldValidators) {
       return;
     }
@@ -100,7 +99,6 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
 
     const actionSubscription = this.actions$
       .filter(action => errorCheckActionTypes.indexOf(action.type) !== -1)
-      .do(console.log)
       .subscribe(() => this.updateFieldErrors(this.formState));
 
     this.subscriptions.push(storeSubscription, actionSubscription);
