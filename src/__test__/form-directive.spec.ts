@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { Store, Action, ActionsSubject } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/observable';
+import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { PartialObserver } from 'rxjs/Observer';
 
