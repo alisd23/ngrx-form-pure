@@ -1,4 +1,4 @@
-import { NgModule, ModuleWithProviders, Optional } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 
 import { formReducer } from './reducer';

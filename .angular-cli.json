@@ -23,7 +23,7 @@
       "index": "index.html",
       "main": "main.ts",
       "polyfills": "../polyfills.ts",
-      "tsconfig": "tsconfig.app.json",
+      "tsconfig": "tsconfig.json",
       "prefix": "app",
       "scripts": [],
       "environmentSource": "environments/environment.ts",
@@ -40,13 +40,13 @@
   },
   "lint": [
     {
-      "project": "demo/tsconfig.app.json"
+      "project": "demo/tsconfig.json"
     },
     {
       "project": "src/tsconfig.spec.json"
     },
     {
-      "project": "integration/tsconfig.e2e.json"
+      "project": "integration/tsconfig.json"
     }
   ],
   "test": {

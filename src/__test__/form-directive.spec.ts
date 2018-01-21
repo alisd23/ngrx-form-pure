@@ -1,64 +1,22 @@
-import { Component, Injectable, DebugElement } from '@angular/core';
-import { TestBed, ComponentFixture, async, fakeAsync, tick } from '@angular/core/testing';
+import { DebugElement } from '@angular/core';
+import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Store, Action, ActionsSubject } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { PartialObserver } from 'rxjs/Observer';
 
 import {
-  FormDirective, FieldDirective, InitFormAction, DestroyFormAction, SetInitialValuesAction, Actions,
-  IFormState, ActionConstants, RegisterFieldAction
+  FormDirective, ActionConstants, IFieldValidators
 } from '../index';
 
-const FORM_NAME = 'test';
-
-interface TestFormShape {
-  name: string;
-  age: string;
-}
-
-type TestFormState = IFormState<TestFormShape>;
-
-interface RootState {
-  form:  {
-    test: TestFormState
-  }
-}
-
-type TestAction = Actions<RootState['form'], TestFormShape>;
-
-@Component({
-  selector: 'test-form-component',
-  template: `
-    <form ngrxForm="${FORM_NAME}">
-      <input ngrxField="name" />
-      <input ngrxField="age" />
-    </form>
-  `
-})
-class TestComponent {}
-
-@Injectable()
-class StoreMock {
-  state$ = new BehaviorSubject({});
-
-  select(...keys: any[]) {
-    return this;
-  }
-
-  dispatch(action: TestAction) {}
-
-  subscribe(...args): Subscription {
-    return this.state$.subscribe(...args);
-  }
-}
+import { TestComponent } from './util/test.component';
+import { TestAction, FORM_NAME, TestFormShape } from './util/types';
+import { setup, createRootState } from './util/setup';
+import { StoreMock } from './mock/store-mock';
+import { dispatchEvent } from '@angular/core/src/view/util';
+import { directive } from '@angular/core/src/render3/instructions';
 
 describe('Form directive [ngrxForm]', () => {
-  let component: TestComponent;
-  let directive: FormDirective;
+  let formDirective: FormDirective;
   let store: StoreMock;
   let fixture: ComponentFixture<TestComponent>;
   let debugElement: DebugElement;
@@ -66,68 +24,56 @@ describe('Form directive [ngrxForm]', () => {
 
   beforeEach(async(() => {
     actions$ = new Subject();
-
-    TestBed.configureTestingModule({
-      declarations: [
-        TestComponent,
-        FormDirective,
-        FieldDirective
-      ],
-      providers: [
-        { provide: Store, useClass: StoreMock },
-        { provide: ActionsSubject, useFactory: () => actions$ }
-      ]
-    })
-    .compileComponents();
+    setup(actions$);
   }));
 
-  function setup() {
+  function setupTest() {
     fixture = TestBed.createComponent(TestComponent);
-    component = fixture.componentInstance;
     debugElement = fixture.debugElement.query(By.directive(FormDirective));
-    directive = debugElement.injector.get(FormDirective);
+    formDirective = debugElement.injector.get(FormDirective);
     store = debugElement.injector.get(Store) as any;
   }
 
   it('should create directive', () => {
-    setup();
-    expect(directive).toBeTruthy();
+    setupTest();
+    expect(formDirective).toBeTruthy();
   });
 
-  it('should destroy form on destroy', () => {
-    setup();
+  it('should fire DESTROY_FORM action on destroy', () => {
+    setupTest();
     const dispatchSpy = spyOn(store, 'dispatch');
     fixture.detectChanges();
 
-    directive.ngOnDestroy();
+    formDirective.ngOnDestroy();
     fixture.detectChanges();
 
-    // 4 times because INIT_FORM, 2 REGISTER_FIELD actions, and DESTROY_FORM action
+    // 1 FORM_INIT action, 2 REGISTER_FIELD actions, 1 DESTROY_FORM action
     expect(dispatchSpy).toHaveBeenCalledTimes(4);
-    expect(dispatchSpy.calls.argsFor(3)).toEqual([
-      {
-        type: '@ngrx-form/destroy',
-        payload: { formName: FORM_NAME }
-      } as TestAction
-    ]);
+
+    const destroyAction: TestAction = {
+      type: ActionConstants.DESTROY_FORM,
+      payload: { formName: FORM_NAME }
+    }
+    expect(dispatchSpy.calls.argsFor(3)).toEqual([destroyAction]);
   });
 
   it('emits form values on form submit', () => {
-    setup();
+    setupTest();
     fixture.detectChanges();
 
-    store.state$.next({
+    store.subject$.next(createRootState({
       fields: {
         name: { value: 'John' },
         age: { value: '40' },
       }
-    });
+    }));
 
     const submitSpy = jasmine.createSpy('onSubmit');
-    directive.submit.subscribe(submitSpy);
+    formDirective.submit.subscribe(submitSpy);
     debugElement.triggerEventHandler('submit', new Event('submit'));
     fixture.detectChanges();
 
+    // 1 FORM_INIT action
     expect(submitSpy).toHaveBeenCalledTimes(1);
     expect(submitSpy).toHaveBeenCalledWith({
       name: 'John',
@@ -135,58 +81,123 @@ describe('Form directive [ngrxForm]', () => {
     });
   });
 
-  it('should initialise form on init', () => {
-    setup();
+  it('should fire INIT_FORM action on init', () => {
+    setupTest();
     const dispatchSpy = spyOn(store, 'dispatch');
     fixture.detectChanges();
 
-    expect(directive.formName).toBe(FORM_NAME);
-    // 3 times because of the 2 REGISTER_FIELD actions fired by the fields
+    // 1 FORM_INIT action, 2 REGISTER_FIELD actions
     expect(dispatchSpy).toHaveBeenCalledTimes(3);
-    expect(dispatchSpy.calls.argsFor(0)).toEqual([
-      {
-        type: '@ngrx-form/init',
-        payload: { formName: FORM_NAME }
-      } as TestAction
-    ]);
+
+    const initAction: TestAction = {
+      type: ActionConstants.INIT_FORM,
+      payload: { formName: FORM_NAME }
+    }
+    expect(dispatchSpy.calls.argsFor(0)).toEqual([initAction]);
   });
 
-  it('fires FORM_INIT, SET_INITIAL_VALUES, and REGISTER_FIELD actions in correct order after initialising', () => {
-    setup();
+  it('should fire SET_INITIAL_VALUES if initial values are supplied', () => {
+    setupTest();
     const dispatchSpy = spyOn(store, 'dispatch');
     const initialValues = {
       name: 'Jen',
       age: '30'
     }
-    directive.initialValues = initialValues;
+    formDirective.initialValues = initialValues;
     fixture.detectChanges();
 
-    expect(dispatchSpy.calls.allArgs()).toEqual([
-      [{
-        type: '@ngrx-form/init',
-        payload: { formName: FORM_NAME }
-      }] as TestAction[],
-      [{
-        type: '@ngrx-form/register-field',
-        payload: {
-          formName: FORM_NAME,
-          fieldName: 'name',
-        }
-      }] as TestAction[],
-      [{
-        type: '@ngrx-form/register-field',
-        payload: {
-          formName: FORM_NAME,
-          fieldName: 'age',
-        }
-      }] as TestAction[],
-      [{
-        type: ActionConstants.SET_INITIAL_VALUES,
-        payload: {
-          formName: FORM_NAME,
-          values: initialValues
-        }
-      }] as TestAction[]
+    // 1 FORM_INIT action, 2 REGISTER_FIELD actions, 1 INITIAL_VALUES action
+    expect(dispatchSpy).toHaveBeenCalledTimes(4);
+
+    const setInitialAction: TestAction = {
+      type: ActionConstants.SET_INITIAL_VALUES,
+      payload: {
+        formName: FORM_NAME,
+        values: initialValues
+      }
+    }
+    expect(dispatchSpy.calls.argsFor(3)).toEqual([setInitialAction]);
+  });
+
+  it('should call updateFieldErrors after INIT_FORM action', () => {
+    setupTest();
+    fixture.detectChanges();
+    const updateSpy = spyOn(formDirective, 'updateFieldErrors');
+
+    const state = createRootState({
+      fields: {
+        name: { value: '' },
+        age: { value: '40' },
+      }
+    });
+
+    const initAction: TestAction = {
+      type: ActionConstants.INIT_FORM,
+      payload: { formName: FORM_NAME }
+    }
+
+    // Simulate corresponding state change from INIT_FORM action
+    store.subject$.next(state);
+    // Simulate INIT_FORM action
+    actions$.next(initAction);
+
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+    expect(updateSpy.calls.allArgs()).toEqual([
+      [state.form.test]
     ]);
+  });
+
+  it('should call updateFieldErrors after CHANGE_FIELD action', () => {
+    setupTest();
+    fixture.detectChanges();
+    const updateSpy = spyOn(formDirective, 'updateFieldErrors');
+
+    const state = createRootState({
+      fields: {
+        name: { value: 'Bob' },
+        age: { value: '' },
+      }
+    });
+
+    const changeAction: TestAction = {
+      type: ActionConstants.CHANGE_FIELD,
+      payload: { formName: FORM_NAME, fieldName: 'name', value: 'Bob' }
+    }
+
+    // Simulate corresponding state change from INIT_FORM action
+    store.subject$.next(state);
+    // Simulate INIT_FORM action
+    actions$.next(changeAction);
+
+    expect(updateSpy).toHaveBeenCalledTimes(1);
+    expect(updateSpy.calls.allArgs()).toEqual([
+      [state.form.test]
+    ]);
+  });
+
+  describe('updateFieldErrors()', () => {
+    it('does nothing when no validators are present', () => {
+      // const updateErrorsAction: TestAction = {
+      //   type: ActionConstants.UPDATE_FIELD_ERRORS,
+      //   payload: {
+      //     formName: FORM_NAME,
+      //     errors: {}
+      //   }
+      // };
+      // 1 FORM_INIT action, 2 REGISTER_FIELD actions, 1 UPDATE_FIELD_ERRORS action
+      // expect(dispatchSpy.calls.argsFor(3)).toEqual([updateErrorsAction]);
+    });
+
+    it('does does nothing when field errors have not changed', () => {
+
+    });
+
+    it('fires an UPDATE_FIELD_ERRORS action when an field transitions TO an error state', () => {
+
+    });
+
+    it('fires an UPDATE_FIELD_ERRORS action when an field transitions AWAY an error state', () => {
+
+    });
   });
 });

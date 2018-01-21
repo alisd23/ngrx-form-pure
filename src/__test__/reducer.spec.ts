@@ -1,14 +1,9 @@
-import { formReducer, getFormActions, IFormState, IFormReducerState, IFormFieldState, IFormValues, IFieldErrors } from '../index';
+import { formReducer, getFormActions, IFormFieldState, IFieldErrors } from '../index';
 import immer from 'immer';
 
-interface TestFormShape {
-  name: string;
-  age: string;
-}
+import { TestFormShape, RootState } from './util/types';
 
-interface RootFormsState {
-  test?: IFormState<TestFormShape>;
-}
+type RootFormsState = RootState['form'];
 
 const TEST_FORM_NAME = 'test';
 

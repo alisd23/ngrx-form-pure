@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { IFormReducerState, IFormState, IFieldErrors, IFormValues } from './types';
+import { IFormReducerState, IFieldErrors, IFormValues } from './types';
 
 // ========================= //
 //        ACTION TYPES       //

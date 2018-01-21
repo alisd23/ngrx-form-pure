@@ -1,8 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "baseUrl": "demo",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
@@ -12,10 +10,7 @@
     "lib": [
       "es2016",
       "dom"
-    ],
-    "paths": {
-      "ngrx-form": [ "../dist" ]
-    }
+    ]
   },
   "include": [
     "./polyfills.ts"
