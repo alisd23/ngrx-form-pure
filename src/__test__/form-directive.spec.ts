@@ -5,15 +5,13 @@ import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs/Subject';
 
 import {
-  FormDirective, ActionConstants, IFieldValidators
+  FormDirective, ActionConstants
 } from '../index';
 
 import { TestComponent } from './util/test.component';
-import { TestAction, FORM_NAME, TestFormShape } from './util/types';
+import { TestAction, FORM_NAME } from './util/types';
 import { setup, createRootState } from './util/setup';
 import { StoreMock } from './mock/store-mock';
-import { dispatchEvent } from '@angular/core/src/view/util';
-import { directive } from '@angular/core/src/render3/instructions';
 
 describe('Form directive [ngrxForm]', () => {
   let formDirective: FormDirective;
