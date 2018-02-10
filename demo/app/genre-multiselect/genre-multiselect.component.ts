@@ -5,7 +5,7 @@ import { getFormActions, IFormFieldState } from 'ngrx-form';
 import { AppFormState, AppState } from '../app-store.module';
 import { Genre } from '../types';
 
-const queryFormActions = getFormActions<AppFormState>('query');
+const userFormActions = getFormActions<AppFormState>('newUser');
 
 @Component({
   selector: 'app-genre-multiselect',
@@ -17,12 +17,12 @@ export class GenreMultiselectComponent implements OnInit {
   public values: Genre[];
   public options = Object.keys(Genre);
 
-  fieldState: IFormFieldState<Genre[]>;
+  private fieldState: IFormFieldState<Genre[]>;
 
   constructor(store: Store<AppState>) {
     this.store = store;
     this.store
-      .select('form', 'query', 'fields', 'genres')
+      .select('form', 'newUser', 'fields', 'genres')
       .filter(Boolean)
       .subscribe(state => this.values = state.value);
   }
@@ -37,7 +37,7 @@ export class GenreMultiselectComponent implements OnInit {
     }
 
     this.store.dispatch(
-      queryFormActions.changeField('genres', Array.from(valuesSet)
+      userFormActions.changeField('genres', Array.from(valuesSet)
     ));
   }
 
@@ -46,6 +46,8 @@ export class GenreMultiselectComponent implements OnInit {
   }
 
   public ngOnInit() {
-    queryFormActions.registerField('genres');
+    this.store.dispatch(
+      userFormActions.registerField('genres')
+    );
   }
 }

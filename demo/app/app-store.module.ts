@@ -1,7 +1,7 @@
 import { IFormState } from 'ngrx-form';
 import { Colour, Band, Hobby, Genre } from './types';
 
-export interface QueryFormShape {
+export interface UserFormShape {
   name: string;
   age: string;
   colour: Colour;
@@ -12,7 +12,7 @@ export interface QueryFormShape {
 }
 
 export interface AppFormState {
-  query: IFormState<QueryFormShape>;
+  newUser: IFormState<UserFormShape>;
 }
 
 export interface AppState {

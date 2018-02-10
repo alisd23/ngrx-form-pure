@@ -8,6 +8,8 @@ import { IFormState, IFieldValidators, IStoreState } from '../types';
 import { getFormActions, FormActions, ActionConstants } from '../actions';
 import { getFormValues } from '../selectors';
 
+import 'rxjs/add/operator/filter';
+
 @Directive({
   selector: '[ngrxForm]'
 })
@@ -56,7 +58,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
         // Run through validators in order until first validator returns something
         // truthy - the error string.
         for (const validate of validators) {
-          const newError = validate(field.value, this.formState);
+          const newError = validate(field.value, state);
 
           // If the current error (or none) for this field is different from the new calculated
           // error (i.e. the fields error state has changed) then add this to the object

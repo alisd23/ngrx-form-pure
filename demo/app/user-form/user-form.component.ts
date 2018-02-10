@@ -2,17 +2,17 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormState, IFieldErrors } from 'ngrx-form';
 
-import { AppFormState, QueryFormShape, AppState } from '../app-store.module';
+import { AppFormState, UserFormShape, AppState } from '../app-store.module';
 import { Colour, Band, Hobby } from '../types';
 
-const queryFormActions = getFormActions<AppFormState>('query');
+const userFormActions = getFormActions<AppFormState>('newUser');
 
 @Component({
-  selector: 'app-query',
-  templateUrl: './query.component.html',
-  styleUrls: ['./query.component.scss']
+  selector: 'app-user-form',
+  templateUrl: './user-form.component.html',
+  styleUrls: ['./user-form.component.scss']
 })
-export class QueryComponent {
+export class UserFormComponent {
   public colours = Object.keys(Colour);
   public bands = Object.keys(Band);
   public hobbies = Object.keys(Hobby);
@@ -20,9 +20,9 @@ export class QueryComponent {
   public store: Store<AppState>;
   public loading = false;
 
-  formState: IFormState<QueryFormShape>;
+  public formState: IFormState<UserFormShape>;
 
-  initialValues: Partial<QueryFormShape> = {
+  public initialValues: Partial<UserFormShape> = {
     age: '23',
     colour: Colour.green,
     hobbies: [],
@@ -30,7 +30,7 @@ export class QueryComponent {
     genres: []
   }
 
-  fieldValidators: IFieldValidators<QueryFormShape> = {
+  public fieldValidators: IFieldValidators<UserFormShape> = {
     name: [validators.required('Name')],
     age: [validators.required('Age')],
     colour: [validators.required('Colour')],
@@ -40,11 +40,11 @@ export class QueryComponent {
   constructor(store: Store<AppState>) {
     this.store = store;
     this.store
-      .select('form', 'query')
+      .select('form', 'newUser')
       .subscribe(state => this.formState = state);
   }
 
-  get fieldErrors(): IFieldErrors<QueryFormShape> {
+  public get fieldErrors(): IFieldErrors<UserFormShape> {
     if (this.formState) {
       return getFieldErrors(this.formState);
     } else {
@@ -52,11 +52,11 @@ export class QueryComponent {
     }
   }
 
-  getBandName(band: Band) {
+  public getBandName(band: Band) {
     return Band[band];
   }
 
-  showFieldError(fieldName: keyof QueryFormShape) {
+  public showFieldError(fieldName: keyof UserFormShape) {
     const isFieldTouched = (
       this.formState &&
       this.formState.fields[fieldName] &&
@@ -65,12 +65,12 @@ export class QueryComponent {
     return isFieldTouched && this.fieldErrors[fieldName];
   }
 
-  isHobbyChecked = (hobby: Hobby) => (hobbies: Hobby[]) => {
+  public isHobbyChecked = (hobby: Hobby) => (hobbies: Hobby[]) => {
     return hobbies && hobbies.indexOf(hobby) !== -1;
   }
 
-  onHobbyChange = (hobby: Hobby) =>
-    (checked: boolean, e: Event): QueryFormShape['hobbies'] => {
+  public onHobbyChange = (hobby: Hobby) =>
+    (checked: boolean, e: Event): UserFormShape['hobbies'] => {
       const currentState = this.formState.fields.hobbies.value;
       const newState = new Set(currentState);
 
@@ -83,7 +83,7 @@ export class QueryComponent {
       return Array.from(newState);
   }
 
-  onSubmit(values: QueryFormShape) {
+  public onSubmit(values: UserFormShape) {
     console.log('Submitted', values);
     this.loading = true;
     setTimeout(
@@ -95,7 +95,9 @@ export class QueryComponent {
     )
   }
 
-  onReset() {
-    (queryFormActions as any).reset();
+  public onReset() {
+    this.store.dispatch(
+      userFormActions.resetForm()
+    );
   }
 }

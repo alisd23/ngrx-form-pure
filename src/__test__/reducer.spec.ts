@@ -1,15 +1,21 @@
 import { formReducer, getFormActions, IFormFieldState, IFieldErrors } from '../index';
 import immer from 'immer';
 
-import { ITestFormShape, IRootState } from './util/types';
+import { ITestFormShape, IRootState, FORM_NAME } from './util/types';
 
 type RootFormsState = IRootState['form'];
 
 const TEST_FORM_NAME = 'test';
 
-describe('reducer', () => {
+const formActions = getFormActions<RootFormsState>(TEST_FORM_NAME);
+
+/**
+ * The following tests run in sequence and all have dependencies on the previous tests.
+ * This is to model the lifecycle of a form, allowing the testing of previous/expected states
+ * in a less verbose way.
+ */
+describe('reducer sequential test cases', () => {
   let state: RootFormsState = {};
-  const formActions = getFormActions<RootFormsState>('test');
 
   // Initialise form
   describe('INIT_FORM action', () => {
@@ -214,5 +220,67 @@ describe('reducer', () => {
       state = formReducer(state as any, formActions.destroyForm());
       expect(state).toEqual(expected);
     })
-  })
+  });
+});
+
+describe('reducer isolated test cases', () => {
+  describe('RESET_FORM action', () => {
+    it ('should set state correctly', () => {
+      const initialValues = {
+        name: 'INITIAL_NAME',
+        age: '99'
+      };
+
+      const prevState: RootFormsState = {
+        [FORM_NAME]: {
+          name: FORM_NAME,
+          fields: {
+            age: {
+              value: '200',
+              focus: true,
+              touched: true,
+              error: 'some error',
+              count: 1,
+            },
+            name: {
+              value: 'some name',
+              focus: false,
+              touched: true,
+              error: 'some error',
+              count: 1,
+            }
+          },
+          invalid: true,
+          initialValues
+        }
+      };
+      const expectedState: RootFormsState = {
+        [FORM_NAME]: {
+          name: FORM_NAME,
+          fields: {
+            name: {
+              value: 'INITIAL_NAME',
+              focus: false,
+              touched: false,
+              error: undefined,
+              count: 1,
+            },
+            age: {
+              value: '99',
+              focus: false,
+              touched: false,
+              error: undefined,
+              count: 1,
+            }
+          },
+          invalid: false,
+          initialValues
+        }
+      };
+
+      const newState = formReducer(prevState, formActions.resetForm());
+
+      expect(newState).toEqual(expectedState);
+    });
+  });
 });

@@ -1,11 +1,11 @@
 <form
-  ngrxForm="query"
+  ngrxForm="newUser"
   (ngrxSubmit)="onSubmit($event)"
   [fieldValidators]="fieldValidators"
   [initialValues]="initialValues"
 >
   <div>
-    <h2>Query Form</h2>
+    <h2>New User Form</h2>
     
     <!-- Name string input -->
     <h3>Name</h3>
@@ -100,5 +100,9 @@
     <div *ngIf="loading">
       ...LOADING...
     </div>
+    
+    <button (click)="onReset()">
+      Reset Form
+    </button>
   </div>
 </form>

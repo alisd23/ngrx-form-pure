@@ -8,10 +8,12 @@ import { IFormReducerState, IFieldErrors, IFormValues } from './types';
 
 export enum ActionConstants {
   INIT_FORM = '@ngrx-form/init',
+  RESET_FORM = '@ngrx-form/reset-form',
   DESTROY_FORM = '@ngrx-form/destroy',
   FOCUS_FIELD = '@ngrx-form/focus',
   BLUR_FIELD = '@ngrx-form/blur',
   CHANGE_FIELD = '@ngrx-form/change',
+  RESET_FIELD = '@ngrx-form/reset-field',
   UPDATE_FIELD_ERRORS = '@ngrx-form/update-field-errors',
   REGISTER_FIELD = '@ngrx-form/register-field',
   UNREGISTER_FIELD = '@ngrx-form/unregister-field',
@@ -20,6 +22,13 @@ export enum ActionConstants {
 
 export interface InitFormAction<RootFormsState> extends Action {
   type: ActionConstants.INIT_FORM;
+  payload: {
+    formName: keyof RootFormsState;
+  };
+}
+
+export interface ResetFormAction<RootFormsState> extends Action {
+  type: ActionConstants.RESET_FORM;
   payload: {
     formName: keyof RootFormsState;
   };
@@ -55,7 +64,16 @@ export interface ChangeFieldAction<RootFormsState, FormShape> extends Action {
   };
 }
 
-export interface UpdateFieldErrors<RootFormsState, FormShape> extends Action {
+export interface ResetFieldAction<RootFormsState, FormShape> extends Action {
+  type: ActionConstants.RESET_FIELD;
+  payload: {
+    formName: keyof RootFormsState;
+    fieldName: keyof FormShape;
+    value?: any;
+  };
+}
+
+export interface UpdateFieldErrorsAction<RootFormsState, FormShape> extends Action {
   type: ActionConstants.UPDATE_FIELD_ERRORS;
   payload: {
     formName: keyof RootFormsState;
@@ -89,11 +107,13 @@ export interface SetInitialValuesAction<RootFormsState, FormShape> extends Actio
 
 export type Actions<RootFormsState extends IFormReducerState, FormShape> =
   InitFormAction<RootFormsState> |
+  ResetFormAction<RootFormsState> |
   DestroyFormAction<RootFormsState> |
   FocusFieldAction<RootFormsState, FormShape> |
   BlurFieldAction<RootFormsState, FormShape> |
   ChangeFieldAction<RootFormsState, FormShape> |
-  UpdateFieldErrors<RootFormsState, FormShape> |
+  ResetFieldAction<RootFormsState, FormShape> |
+  UpdateFieldErrorsAction<RootFormsState, FormShape> |
   RegisterFieldAction<RootFormsState, FormShape> |
   UnregisterFieldAction<RootFormsState, FormShape> |
   SetInitialValuesAction<RootFormsState, FormShape>;
@@ -106,6 +126,8 @@ export type Actions<RootFormsState extends IFormReducerState, FormShape> =
 export interface FormActions<RootFormsState, FormShape> {
   initForm: () =>
     InitFormAction<RootFormsState>;
+  resetForm: () =>
+    ResetFormAction<RootFormsState>;
   destroyForm: () =>
     DestroyFormAction<RootFormsState>;
   focusField: (fieldName: keyof FormShape) =>
@@ -114,8 +136,10 @@ export interface FormActions<RootFormsState, FormShape> {
     BlurFieldAction<RootFormsState, FormShape>;
   changeField: (fieldName: keyof FormShape, value: any) =>
     ChangeFieldAction<RootFormsState, FormShape>;
+  resetField: (fieldName: keyof FormShape, value: any) =>
+    ResetFieldAction<RootFormsState, FormShape>;
   updateFieldErrors: (errors: IFieldErrors<Partial<FormShape>>) =>
-    UpdateFieldErrors<RootFormsState, FormShape>
+    UpdateFieldErrorsAction<RootFormsState, FormShape>
   registerField: (fieldName: keyof FormShape) =>
     RegisterFieldAction<RootFormsState, FormShape>;
   unregisterField: (fieldName: keyof FormShape) =>
@@ -132,6 +156,10 @@ export function getFormActions<RootFormsState extends any>(formName: keyof RootF
       type: ActionConstants.INIT_FORM,
       payload: { formName }
     }),
+    resetForm: () => ({
+      type: ActionConstants.RESET_FORM,
+      payload: { formName }
+    }),
     destroyForm: () => ({
       type: ActionConstants.DESTROY_FORM,
       payload: { formName }
@@ -146,6 +174,10 @@ export function getFormActions<RootFormsState extends any>(formName: keyof RootF
     }),
     changeField: (fieldName, value) => ({
       type: ActionConstants.CHANGE_FIELD,
+      payload: { formName, fieldName, value }
+    }),
+    resetField: (fieldName, value) => ({
+      type: ActionConstants.RESET_FIELD,
       payload: { formName, fieldName, value }
     }),
     updateFieldErrors: (errors) => ({

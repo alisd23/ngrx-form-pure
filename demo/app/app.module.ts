@@ -5,7 +5,7 @@ import { storeLogger } from 'ngrx-store-logger';
 import { StoreModule } from '@ngrx/store';
 
 import { AppComponent } from './app.component';
-import { QueryComponent } from './query/query.component';
+import { UserFormComponent } from './user-form/user-form.component';
 import { GenreMultiselectComponent } from './genre-multiselect/genre-multiselect.component';
 
 export const metaReducers = [storeLogger()];
@@ -13,7 +13,7 @@ export const metaReducers = [storeLogger()];
 @NgModule({
   declarations: [
     AppComponent,
-    QueryComponent,
+    UserFormComponent,
     GenreMultiselectComponent
   ],
   imports: [

@@ -175,6 +175,12 @@ describe('Form directive [ngrxForm]', () => {
   });
 
   describe('updateFieldErrors()', () => {
+    const defaultFieldValidators: IFieldValidators<ITestFormShape> = {
+      // Name is invalid when set to 'ERROR'
+      name: [value => value === 'ERROR' ? 'Name error' : undefined],
+      age: [],
+    };
+
     /**
      * Helper function to test the updateFieldErrors() method, given the new
      * form state and validators
@@ -184,7 +190,6 @@ describe('Form directive [ngrxForm]', () => {
       newFormState: any,
       fieldValidators: IFieldValidators<ITestFormShape>
     ) {
-      setupTest();
       fixture.detectChanges();
 
       formDirective.fieldValidators = fieldValidators;
@@ -199,12 +204,9 @@ describe('Form directive [ngrxForm]', () => {
           age: { value: '' },
         }
       };
-      const fieldValidators: IFieldValidators<ITestFormShape> = {
-        name: [],
-        age: [],
-      };
 
-      testUpdateFieldErrors(newFormState, fieldValidators);
+      setupTest();
+      testUpdateFieldErrors(newFormState, defaultFieldValidators);
 
       const dispatchedActionTypes = dispatchSpy.calls.allArgs().map(a => a[0].type);
 
@@ -213,41 +215,76 @@ describe('Form directive [ngrxForm]', () => {
       expect(dispatchedActionTypes).not.toContain(ActionConstants.UPDATE_FIELD_ERRORS);
     });
 
-    it('does does nothing when field errors have not changed', () => {
+    it('does nothing when field errors have not changed', () => {
       const newFormState = {
         fields: {
           name: { value: '' },
           age: { value: '' },
         }
       };
-      const fieldValidators: IFieldValidators<ITestFormShape> = {
-        name: [value => value ? '' : 'No name defined'],
-        age: [],
+
+      setupTest();
+      testUpdateFieldErrors(newFormState, defaultFieldValidators);
+
+      // 1 FORM_INIT action, 2 REGISTER_FIELD actions
+      expect(dispatchSpy).toHaveBeenCalledTimes(3);
+    });
+
+    it('fires an UPDATE_FIELD_ERRORS action when an field transitions TO an error state', () => {
+      const newFormState = {
+        fields: {
+          name: { value: 'ERROR' },
+          age: { value: '' },
+        }
       };
 
-      testUpdateFieldErrors(newFormState, fieldValidators);
+      setupTest();
+      testUpdateFieldErrors(newFormState, defaultFieldValidators);
 
       const updateFieldErrorsAction: ITestAction = {
         type: ActionConstants.UPDATE_FIELD_ERRORS,
         payload: {
           formName: FORM_NAME,
           errors: {
-            name: 'No name defined'
+            name: 'Name error'
           }
         }
       };
 
-      // 1 FORM_INIT action, 2 REGISTER_FIELD actions
+      // 1 FORM_INIT action, 2 REGISTER_FIELD, 1 UPDATE_FIELD_ERRORS actions
       expect(dispatchSpy).toHaveBeenCalledTimes(4);
-      expect(dispatchSpy.calls.argsFor(3)).toEqual([updateFieldErrorsAction])
+      expect(dispatchSpy.calls.argsFor(3)).toEqual([updateFieldErrorsAction]);
     });
 
-    it('fires an UPDATE_FIELD_ERRORS action when an field transitions TO an error state', () => {
+    it('fires an UPDATE_FIELD_ERRORS action when an field transitions AWAY from an error state', () => {
+      const previousFormState = {
+        fields: {
+          name: { value: 'ERROR', error: undefined },
+          age: { value: '' },
+        }
+      };
+      const newFormState = {
+        fields: {
+          name: { value: 'NOT ERROR', error: 'Name error' },
+          age: { value: '' },
+        }
+      };
 
-    });
+      setupTest();
+      testUpdateFieldErrors(previousFormState, defaultFieldValidators);
+      testUpdateFieldErrors(newFormState, defaultFieldValidators);
 
-    it('fires an UPDATE_FIELD_ERRORS action when an field transitions AWAY an error state', () => {
+      const updateFieldErrorsAction: ITestAction = {
+        type: ActionConstants.UPDATE_FIELD_ERRORS,
+        payload: {
+          formName: FORM_NAME,
+          errors: {}
+        }
+      };
 
+      // 1 FORM_INIT action, 2 REGISTER_FIELD, 2 UPDATE_FIELD_ERRORS actions
+      expect(dispatchSpy).toHaveBeenCalledTimes(5);
+      expect(dispatchSpy.calls.argsFor(4)).toEqual([updateFieldErrorsAction])
     });
   });
 });
