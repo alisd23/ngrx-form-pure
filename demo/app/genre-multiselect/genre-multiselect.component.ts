@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getFormActions, IFormFieldState } from 'ngrx-form';
+import { getFormActions } from 'ngrx-form';
 
 import { AppFormState, AppState } from '../app-store.module';
 import { Genre } from '../types';
@@ -16,8 +16,6 @@ export class GenreMultiselectComponent implements OnInit {
   public store: Store<AppState>;
   public values: Genre[];
   public options = Object.keys(Genre);
-
-  private fieldState: IFormFieldState<Genre[]>;
 
   constructor(store: Store<AppState>) {
     this.store = store;

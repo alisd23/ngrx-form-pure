@@ -63,7 +63,7 @@ function setInitialValuesReducer(
   action: SetInitialValuesAction<IFormReducerState, any>
 ) {
   const formActions = getFormActions<any>(action.payload.formName);
-  const { values, formName } = action.payload;
+  const { values } = action.payload;
   const fieldNames = Object.keys(values);
   const fieldsState = { ...state.fields };
 
