@@ -5,7 +5,7 @@ export class SelectField {
   public options: ElementArrayFinder;
 
   constructor(fieldName: string) {
-    this.select = $(`input[ngrxField='${fieldName}'`);
+    this.select = $(`select[ngrxField='${fieldName}'`);
     this.options = this.select.$$('option');
   }
 

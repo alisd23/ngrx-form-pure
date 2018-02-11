@@ -4,6 +4,8 @@ import { DemoPage } from './demo.po';
 describe('ngrx-form integration tests', () => {
   let page: DemoPage;
 
+  // Currently these tests all run in sequence, without a refresh inbetween.
+  // This makes the tests much quicker to run.
   beforeEach(() => {
     page = new DemoPage();
   });
@@ -20,7 +22,6 @@ describe('ngrx-form integration tests', () => {
     });
 
     it('should respond to deleting characters', () => {
-      page.nameInput.type('fred');
       page.nameInput.backspace(2);
       expect(page.nameInput.value()).toBe('fr');
     });
@@ -37,11 +38,29 @@ describe('ngrx-form integration tests', () => {
 
   describe('custom select list component', () => {
     it('clicking an unselected item should select it', () => {
-
+      const selectedGenres = ['jazz', 'pop'];
+      selectedGenres.forEach(genre => {
+        page.genreMultiselect.select(genre);
+      })
+      page.genreMultiselect.options.each(option => {
+        option.getAttribute('id').then(id => {
+          const genre = id.split('-')[1];
+          expect(page.genreMultiselect.isSelected(genre))
+            .toBe(selectedGenres.some(g => g === genre));
+        })
+      });
     });
 
     it('clicking a selected item should unselect it', () => {
-
+      page.genreMultiselect.select('jazz');
+      const selectedGenres = ['pop'];
+      page.genreMultiselect.options.each(option => {
+        option.getAttribute('id').then(id => {
+          const genre = id.split('-')[1];
+          expect(page.genreMultiselect.isSelected(genre))
+            .toBe(selectedGenres.some(g => g === genre));
+        });
+      });
     });
   });
 });

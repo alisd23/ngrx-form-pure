@@ -16,6 +16,7 @@ export class TextField {
   }
 
   public backspace(times: number = 1) {
+    this.input.click();
     for (let i = 0; i < times; i++) {
       this.input.sendKeys(Key.BACK_SPACE);
     }

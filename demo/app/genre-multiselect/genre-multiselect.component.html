@@ -1,6 +1,10 @@
-<div class="multiselect">
+<div
+  id="genre-multiselect"
+  class="multiselect"
+>
   <div
     *ngFor="let option of options"
+    [id]="'genre-' + option"
     class="multiselect-item"
     [class.selected]="isOptionSelected(option)"
     (click)="onOptionSelected(option)"
