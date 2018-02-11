@@ -11,22 +11,22 @@ export class CheckboxFieldControl implements IFieldControl, OnDestroy {
   ) {}
 
   // Arrow function to bind context correctly
-  onChange = (e: Event) => {
+  public onChange = (e: Event) => {
     const { checked } = this.element;
     this.fieldInfo.onChange(checked, e);
   }
 
-  onValueUpdate(newValue: boolean) {
+  public onValueUpdate(newValue: boolean) {
     this.element.checked = newValue;
   }
 
-  initialise(fieldInfo: IFieldInfo) {
+  public initialise(fieldInfo: IFieldInfo) {
     this.fieldInfo = fieldInfo;
     this.element = this.elementRef.nativeElement;
     this.element.addEventListener('change', this.onChange);
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.element.removeEventListener('change', this.onChange);
   }
 }

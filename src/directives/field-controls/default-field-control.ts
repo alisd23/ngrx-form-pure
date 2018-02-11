@@ -11,21 +11,21 @@ export class DefaultFieldControl implements IFieldControl, OnDestroy {
   ) {}
 
   // Arrow function to bind context correctly
-  onChange = (e: Event) => {
+  public onChange = (e: Event) => {
     this.fieldInfo.onChange(this.element.value, e);
   }
 
-  onValueUpdate(newValue: string) {
+  public onValueUpdate(newValue: string) {
     this.element.value = newValue || '';
   }
 
-  initialise(fieldInfo: IFieldInfo) {
+  public initialise(fieldInfo: IFieldInfo) {
     this.fieldInfo = fieldInfo;
     this.element = this.elementRef.nativeElement;
     this.element.addEventListener('input', this.onChange);
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.element.removeEventListener('input', this.onChange);
   }
 }

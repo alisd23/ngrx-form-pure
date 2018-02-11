@@ -11,7 +11,7 @@ export class RadioFieldControl implements IFieldControl, OnDestroy {
   ) {}
 
   // Arrow function to bind context correctly
-  onChange = (e: Event) => {
+  public onChange = (e: Event) => {
     const { checked, value } = this.element;
 
     if (checked) {
@@ -19,17 +19,17 @@ export class RadioFieldControl implements IFieldControl, OnDestroy {
     }
   }
 
-  onValueUpdate(newValue: string) {
+  public onValueUpdate(newValue: string) {
     this.element.checked = (newValue === this.element.value)
   }
 
-  initialise(fieldInfo: IFieldInfo) {
+  public initialise(fieldInfo: IFieldInfo) {
     this.fieldInfo = fieldInfo;
     this.element = this.elementRef.nativeElement;
     this.element.addEventListener('change', this.onChange);
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.element.removeEventListener('change', this.onChange);
   }
 }

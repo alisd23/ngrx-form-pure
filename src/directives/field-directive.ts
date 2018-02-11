@@ -41,19 +41,21 @@ export class FieldDirective implements OnInit, OnDestroy {
     private injector: Injector,
   ) {}
 
-  @HostListener('focus') onFocus() {
+  @HostListener('focus')
+  public onFocus() {
     this.store.dispatch(
       this.formActions.focusField(this.fieldName)
     );
   }
 
-  @HostListener('blur') onBlur() {
+  @HostListener('blur')
+  public onBlur() {
     this.store.dispatch(
       this.formActions.blurField(this.fieldName)
     );
   }
 
-  onChange(newValue: any, e: Event) {
+  public onChange(newValue: any, e: Event) {
     if (newValue !== this.fieldValue) {
       this.store.dispatch(
         this.formActions.changeField(
@@ -64,7 +66,7 @@ export class FieldDirective implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.formActions = getFormActions(this.formName);
 
     this.fieldControl = this.injector.get(
@@ -93,7 +95,7 @@ export class FieldDirective implements OnInit, OnDestroy {
     this.initialized = true;
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     if (this.fieldControl) {
       this.fieldControl.ngOnDestroy();
     }
