@@ -11,6 +11,7 @@ import {
 import { TestComponent } from './util/test.component';
 import { ITestAction, ITestFormShape, FORM_NAME } from './util/types';
 import { setup, createRootState } from './util/setup';
+import { createFakeEvent } from './util/fake-event';
 import { StoreMock } from './mock/store-mock';
 
 describe('Form directive [ngrxForm]', () => {
@@ -69,7 +70,7 @@ describe('Form directive [ngrxForm]', () => {
 
     const submitSpy = jasmine.createSpy('onSubmit');
     formDirective.submit.subscribe(submitSpy);
-    debugElement.triggerEventHandler('submit', new Event('submit'));
+    debugElement.triggerEventHandler('submit', createFakeEvent('submit'));
     fixture.detectChanges();
 
     // 1 FORM_INIT action

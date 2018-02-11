@@ -9,6 +9,7 @@
       "name": "src",
       "test": "test.ts",
       "testTsconfig": "tsconfig.spec.json",
+      "tsconfig": "tsconfig.spec.json",
       "main": "index.ts",
       "polyfills": "../polyfills.ts"
     },
