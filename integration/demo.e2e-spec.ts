@@ -38,29 +38,52 @@ describe('ngrx-form integration tests', () => {
 
   describe('custom select list component', () => {
     it('clicking an unselected item should select it', () => {
-      const selectedGenres = ['jazz', 'pop'];
+      const selectedGenres = ['pop', 'jazz'];
       selectedGenres.forEach(genre => {
         page.genreMultiselect.select(genre);
       })
-      page.genreMultiselect.options.each(option => {
-        option.getAttribute('id').then(id => {
-          const genre = id.split('-')[1];
-          expect(page.genreMultiselect.isSelected(genre))
-            .toBe(selectedGenres.some(g => g === genre));
-        })
-      });
+      expect(page.genreMultiselect.selectedValues()).toEqual(selectedGenres);
     });
 
     it('clicking a selected item should unselect it', () => {
       page.genreMultiselect.select('jazz');
       const selectedGenres = ['pop'];
-      page.genreMultiselect.options.each(option => {
-        option.getAttribute('id').then(id => {
-          const genre = id.split('-')[1];
-          expect(page.genreMultiselect.isSelected(genre))
-            .toBe(selectedGenres.some(g => g === genre));
-        });
-      });
+      expect(page.genreMultiselect.selectedValues()).toEqual(selectedGenres);
+    });
+  });
+
+  describe('Favorite band radio group', () => {
+    it('clicking a radio input should select it', () => {
+      expect(page.bandRadioGroup.getSelectedValue().isPresent()).toBeFalsy();
+      page.bandRadioGroup.select('smashMouth');
+      expect(page.bandRadioGroup.isSelected('smashMouth')).toBe(true);
+      expect(page.bandRadioGroup.isSelected('bagRaiders')).toBe(false);
+    });
+
+    it('clicking a selected input does nothing', () => {
+      page.bandRadioGroup.select('smashMouth');
+      expect(page.bandRadioGroup.isSelected('smashMouth')).toBe(true);
+      expect(page.bandRadioGroup.isSelected('bagRaiders')).toBe(false);
+    });
+
+    it('clicking a different radio input should selected it and deselect the previous input', () => {
+      page.bandRadioGroup.select('bagRaiders');
+      expect(page.bandRadioGroup.isSelected('smashMouth')).toBe(false);
+      expect(page.bandRadioGroup.isSelected('bagRaiders')).toBe(true);
+    });
+  });
+
+  describe('Hobbies checkbox group', () => {
+    it('clicking a checkbox selects it', () => {
+      page.hobbiesCheckboxGroup.select('music');
+      expect(page.hobbiesCheckboxGroup.selectedValues()).toEqual(['music']);
+      page.hobbiesCheckboxGroup.select('football');
+      expect(page.hobbiesCheckboxGroup.selectedValues()).toEqual(['football', 'music']);
+    });
+
+    it('clicking a selected checkbox unselects it', () => {
+      page.hobbiesCheckboxGroup.select('football');
+      expect(page.hobbiesCheckboxGroup.selectedValues()).toEqual(['music']);
     });
   });
 });

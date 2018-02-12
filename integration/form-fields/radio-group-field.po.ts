@@ -1,4 +1,5 @@
 import { $$, ElementArrayFinder } from 'protractor';
+import { isFunction } from 'util';
 
 export class RadioGroupField {
   public inputs: ElementArrayFinder;
@@ -27,5 +28,14 @@ export class RadioGroupField {
       .findByValue(value)
       .getAttribute('checked')
       .then(isChecked => isChecked === 'true');
+  }
+
+  public getSelectedValue() {
+    return this.inputs
+      .filter(input => input
+        .getAttribute('checked')
+        .then(isChecked => isChecked === 'true')
+      )
+      .first();
   }
 }

@@ -30,4 +30,18 @@ export class CustomMultiselectField {
       .getAttribute('class')
       .then(classString => classString.includes('selected'));
   }
+
+  public selectedValues() {
+    return this.options
+      .map<string>(option => option
+        .getAttribute('id')
+        .then(id => {
+          const value = id.split('-')[1];
+          return this
+            .isSelected(value)
+            .then(isSelected => isSelected ? value : null);
+        })
+      )
+      .then(a => a.filter(Boolean));
+  }
 }
