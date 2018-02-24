@@ -12,6 +12,7 @@ import { TestComponent } from './util/test.component';
 import { ITestAction, ITestFormShape, FORM_NAME } from './util/types';
 import { setup, createRootState } from './util/setup';
 import { createFakeEvent } from './util/fake-event';
+import { detectFormLifecycleActions } from './util/detect-changes';
 import { StoreMock } from './mock/store-mock';
 
 describe('Form directive [ngrxForm]', () => {
@@ -42,10 +43,12 @@ describe('Form directive [ngrxForm]', () => {
 
   it('should fire DESTROY_FORM action on destroy', () => {
     setupTest();
-    fixture.detectChanges();
+    detectFormLifecycleActions(fixture);
 
+    jasmine.clock().install();
     formDirective.ngOnDestroy();
-    fixture.detectChanges();
+    jasmine.clock().tick(0);
+    jasmine.clock().uninstall();
 
     // 1 FORM_INIT action, 2 REGISTER_FIELD actions, 1 DESTROY_FORM action
     expect(dispatchSpy).toHaveBeenCalledTimes(4);
@@ -59,7 +62,7 @@ describe('Form directive [ngrxForm]', () => {
 
   it('emits form values on form submit', () => {
     setupTest();
-    fixture.detectChanges();
+    detectFormLifecycleActions(fixture);
 
     store.subject$.next(createRootState({
       fields: {
@@ -84,7 +87,7 @@ describe('Form directive [ngrxForm]', () => {
   describe('Angular initialisation (lifecycle)', () => {
     it('should fire INIT_FORM action on init', () => {
       setupTest();
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       // 1 FORM_INIT action, 2 REGISTER_FIELD actions
       expect(dispatchSpy).toHaveBeenCalledTimes(3);
@@ -103,7 +106,7 @@ describe('Form directive [ngrxForm]', () => {
         age: '30'
       }
       formDirective.initialValues = initialValues;
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       // 1 FORM_INIT action, 2 REGISTER_FIELD actions, 1 INITIAL_VALUES action
       expect(dispatchSpy).toHaveBeenCalledTimes(4);
@@ -120,7 +123,7 @@ describe('Form directive [ngrxForm]', () => {
 
     it('should call updateFieldErrors after INIT_FORM action', () => {
       setupTest();
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
       const updateSpy = spyOn(formDirective, 'updateFieldErrors');
 
       const formState = {
@@ -148,7 +151,7 @@ describe('Form directive [ngrxForm]', () => {
 
     it('should call updateFieldErrors after CHANGE_FIELD action', () => {
       setupTest();
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
       const updateSpy = spyOn(formDirective, 'updateFieldErrors');
 
       const changeAction: ITestAction = {
@@ -191,7 +194,7 @@ describe('Form directive [ngrxForm]', () => {
       newFormState: any,
       fieldValidators: IFieldValidators<ITestFormShape>
     ) {
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       formDirective.fieldValidators = fieldValidators;
       formDirective.updateFieldErrors(newFormState as any);

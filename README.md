@@ -1,19 +1,32 @@
 # ngrx-form
 
-**THIS IS A WORK IN PROGRESS**
+Ngrx-form is a library for storing your form state in the global state container provided by `@ngrx/store`.
 
-A forms library for use with `@ngrx/store`.
+The form state for any forms you hook up will be available under the `form` key of the `@ngrx/store` state object.
 
-Some inspiration taken from `redux-form`
+This library has currently only been tested with `@ngrx/store` version **5.x**
 
 ## Installation
-(npm install)
-(yarn install)
 
-(peer depdendencies)
+#### npm
+```
+npm install ngrx-form --save
+```
 
+#### yarn
+```
+yarn add ngrx-form --save
+```
+
+#### Peer Depdendencies
+Ngrx-form has the following peer dependencies which you must install in order
+to use this library:
+- `@angular/core`
+- `@ngrx/store`
 
 ## Usage
+
+### Getting Started
 
 ### Simple Form
 (Form directive)
@@ -50,6 +63,21 @@ Some inspiration taken from `redux-form`
 
 ### Custom Form Controls
 (Action flow - initField, changeField, focusField etc...)
+Link to
+
+
+## Dispatching Form Actions
+(Info on timings and order of form actions)
+Explain all form initialise phase actions must be delayed until AFTER the initial
+round of change detection, as to not cause updates within a change detection phase.
+- https://github.com/angular/angular/issues/6005#issuecomment-165905348
+-
+
+Order of actions in initialisation phase:
+- Form register (inside form ngOnInit)
+- Field register (inside field ngOnInit)
+- Set initial field values (inside form ngAfterContentInit)
+
 
 ## Typescript
 (Root Forms state)

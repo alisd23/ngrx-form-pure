@@ -21,6 +21,14 @@
         "assets",
         "favicon.ico"
       ],
+      "styles": [
+        "styles/global.scss"
+      ],
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "styles"
+        ]
+      },
       "index": "index.html",
       "main": "main.ts",
       "polyfills": "../polyfills.ts",

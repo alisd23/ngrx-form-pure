@@ -1,3 +1,6 @@
-label.error {
-  color: red;
+.ui.form .field.error label.error {
+  margin-top: 6px;
+  &::after {
+    display: none;
+  }
 }

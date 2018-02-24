@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getFormActions } from 'ngrx-form';
+import { getFormActions, delayAction } from 'ngrx-form';
 
 import { AppFormState, AppState } from '../app-store.module';
 import { Genre } from '../types';
@@ -14,15 +14,12 @@ const userFormActions = getFormActions<AppFormState>('newUser');
 })
 export class GenreMultiselectComponent implements OnInit {
   public store: Store<AppState>;
-  public values: Genre[];
+  // Default to something sensible whilst form/fields are initialising
+  public values: Genre[] = [];
   public options = Object.keys(Genre);
 
   constructor(store: Store<AppState>) {
     this.store = store;
-    this.store
-      .select('form', 'newUser', 'fields', 'genres')
-      .filter(Boolean)
-      .subscribe(state => this.values = state.value);
   }
 
   public onOptionSelected(option: Genre) {
@@ -44,8 +41,20 @@ export class GenreMultiselectComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.store.dispatch(
+    // Need to delay any store actions until after the form and all field components
+    // have initialised (all *init functions have run - e.g. ngAfterViewInit).
+    // In angular you are not supposed to trigger changes whilst in a round of change
+    // detection, so all actions must wait until AFTER this initial change detection stage
+    // See the README.md for more information
+    delayAction(() => this.store.dispatch(
       userFormActions.registerField('genres')
-    );
+    ));
+
+    this.store
+      .select('form', 'newUser', 'fields', 'genres', 'value')
+      // Don't want to set values whilst form is initialising, as value will be
+      // undefined/null
+      .filter(value => Boolean(value))
+      .subscribe(values => this.values = values);
   }
 }

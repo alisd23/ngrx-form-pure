@@ -15,6 +15,7 @@ import { TestComponent } from './util/test.component';
 import { createFakeEvent } from './util/fake-event';
 import { ITestAction, FORM_NAME } from './util/types';
 import { setup } from './util/setup';
+import { detectFormLifecycleActions } from './util/detect-changes';
 import { StoreMock } from './mock/store-mock';
 
 describe('Field directive [ngrxField]', () => {
@@ -47,7 +48,7 @@ describe('Field directive [ngrxField]', () => {
       setupTest();
       nameFieldDirective.type = 'text';
       nameField.nativeElement.type = 'text';
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       expect((nameFieldDirective as any).fieldControl.constructor.name).toEqual('DefaultFieldControl');
     });
@@ -56,7 +57,7 @@ describe('Field directive [ngrxField]', () => {
       setupTest();
       nameFieldDirective.type = 'radio';
       nameField.nativeElement.type = 'radio';
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       expect((nameFieldDirective as any).fieldControl.constructor.name).toEqual('RadioFieldControl');
     });
@@ -65,7 +66,7 @@ describe('Field directive [ngrxField]', () => {
       setupTest();
       nameFieldDirective.type = 'checkbox';
       nameField.nativeElement.type = 'checkbox';
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       expect((nameFieldDirective as any).fieldControl.constructor.name).toEqual('CheckboxFieldControl');
     });
@@ -73,7 +74,7 @@ describe('Field directive [ngrxField]', () => {
 
   it('fires REGISTER_FIELD actions at correct point in lifecycle', () => {
     setupTest();
-    fixture.detectChanges();
+    detectFormLifecycleActions(fixture);
 
     const nameRegisterAction: ITestAction = {
       type: ActionConstants.REGISTER_FIELD,
@@ -98,7 +99,7 @@ describe('Field directive [ngrxField]', () => {
 
   it('fires a FOCUS_FIELD action when focused', () => {
     setupTest();
-    fixture.detectChanges();
+    detectFormLifecycleActions(fixture);
 
     nameField.triggerEventHandler('focus', {});
     fixture.detectChanges();
@@ -118,7 +119,7 @@ describe('Field directive [ngrxField]', () => {
 
   it('fires a BLUR_FIELD action when blurred', () => {
     setupTest();
-    fixture.detectChanges();
+    detectFormLifecycleActions(fixture);
 
     nameField.triggerEventHandler('focus', {});
     nameField.triggerEventHandler('blur', {});
@@ -147,7 +148,7 @@ describe('Field directive [ngrxField]', () => {
     function runChangeTest(type: string, controlClass: any, expectedValue: any, setValues: Function) {
       nameFieldDirective.type = type;
       nameField.nativeElement.type = type;
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       const fieldControl = nameField.injector.get(controlClass);
       setValues();
@@ -196,7 +197,7 @@ describe('Field directive [ngrxField]', () => {
 
     it('should do nothing if the value has not changed', () => {
       setupTest();
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       const fieldControl = nameField.injector.get(DefaultFieldControl);
       // Field value is hte current state value of the field
@@ -212,7 +213,7 @@ describe('Field directive [ngrxField]', () => {
     it('stateMutator mutates outgoing value when input value changes', () => {
       setupTest();
       nameFieldDirective.stateMutator = (value) => `mutated: ${value}`;
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       nameFieldDirective.onChange('bob', createFakeEvent('input'));
 
@@ -233,7 +234,7 @@ describe('Field directive [ngrxField]', () => {
     it('valueMutator mutates new incoming value when the inputs\' value changes in state', () => {
       setupTest();
       nameFieldDirective.valueMutator = (stateValue) => `mutated: ${stateValue}`;
-      fixture.detectChanges();
+      detectFormLifecycleActions(fixture);
 
       const newState = {
         form: {
