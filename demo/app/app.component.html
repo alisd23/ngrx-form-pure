@@ -1,6 +1,12 @@
-<div>
-  <h1>
-    ngrx form test application!
-  </h1>
-  <app-user-form></app-user-form>
+<div class="app">
+  <div class="app-main">
+    <h1 class="ui dividing header">
+      Ngrx Form Demo
+    </h1>
+    <app-user-form></app-user-form>
+  </div>
+  <div class="app-sidebar">
+    <h3>Current State</h3>
+    {{state$ | async}}
+  </div>
 </div>

@@ -7,8 +7,10 @@ import { Subscription } from 'rxjs/Subscription';
 import { IFormState, IFieldValidators, IStoreState } from '../types';
 import { getFormActions, FormActions, ActionConstants } from '../actions';
 import { getFormValues } from '../selectors';
+import { delayAction } from '../utils/angular';
 
 import 'rxjs/add/operator/filter';
+
 
 @Directive({
   selector: '[ngrxForm]'
@@ -42,7 +44,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   }
 
   public updateFieldErrors(state: IFormState<any>) {
-    if (!this.fieldValidators) {
+    if (!this.fieldValidators || !state) {
       return;
     }
 
@@ -88,7 +90,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
     this.formActions = getFormActions(this.formName);
 
     // Initialise form state
-    this.store.dispatch(this.formActions.initForm());
+    delayAction(() => this.store.dispatch(this.formActions.initForm()));
 
     const storeSubscription = this.store
       .select('form', this.formName)
@@ -111,9 +113,9 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   // Called after the child directives (and therefore all field directives) have initialised
   public ngAfterContentInit() {
     if (this.initialValues) {
-      this.store.dispatch(
+      delayAction(() => this.store.dispatch(
         this.formActions.setInitialValues(this.initialValues)
-      );
+      ));
     }
 
     if (this.fieldValidators) {
@@ -125,9 +127,9 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
     this.subscriptions.forEach(sub => sub.unsubscribe());
 
     if (this.initialized) {
-      this.store.dispatch(
+      delayAction(() => this.store.dispatch(
         this.formActions.destroyForm()
-      );
+      ));
     }
   }
 }

@@ -7,6 +7,7 @@ import { FormDirective } from './form-directive';
 import { RadioFieldControl, CheckboxFieldControl, DefaultFieldControl } from './field-controls';
 import { IFieldControl, IStoreState } from '../types';
 import { getFormActions, FormActions } from '../actions';
+import { delayAction } from '../utils/angular';
 
 const typeToControl = {
   radio: RadioFieldControl,
@@ -79,9 +80,11 @@ export class FieldDirective implements OnInit, OnDestroy {
       onChange: (value, e) => this.onChange(value, e)
     });
 
-    this.store.dispatch(
+    // Actions in the initialisation (onInit, afterViewInit, ...) phase must be delayed
+    // until after this has completed. See README.md for information.
+    delayAction(() => this.store.dispatch(
       this.formActions.registerField(this.fieldName)
-    )
+    ));
 
     const storeSubscription = this.store
       .select('form', this.formName, 'fields', this.fieldName, 'value')
@@ -103,9 +106,11 @@ export class FieldDirective implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
 
     if (this.initialized) {
-      this.store.dispatch(
+      // Actions in the initialisation (onInit, afterViewInit, ...) phase must be delayed
+      // until after this has completed. See README.md for information.
+      delayAction(() => this.store.dispatch(
         this.formActions.unregisterField(this.fieldName)
-      );
+      ));
     }
   }
 }
