@@ -16,9 +16,16 @@ describe('ngrx-form integration tests', () => {
   });
 
   describe('Name input', () => {
+    it('should display correct initial errors after focus and blur', () => {
+      page.nameInput.input.click();
+      page.colourSelect.select.click();
+      expect(page.nameInput.label.isPresent()).toBe(true);
+    });
+
     it('should respond to typing characters', () => {
       page.nameInput.type('fred');
       expect(page.nameInput.value()).toBe('fred');
+      expect(page.nameInput.label.isPresent()).toBe(false);
     });
 
     it('should respond to deleting characters', () => {

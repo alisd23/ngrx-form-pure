@@ -1,10 +1,12 @@
-import { $, ElementFinder, Key } from 'protractor';
+import { $, ElementFinder, Key, by } from 'protractor';
 
 export class TextField {
   public input: ElementFinder;
+  public label: ElementFinder;
 
   constructor(fieldName: string) {
     this.input = $(`input[ngrxField='${fieldName}'`);
+    this.label = this.input.element(by.xpath('..')).$('label.error');
   }
 
   public value() {

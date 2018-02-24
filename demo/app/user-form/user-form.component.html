@@ -6,7 +6,7 @@
   [initialValues]="initialValues"
 >
   <!-- Name string input -->
-  <div class="field required" [class.error]="showFieldError('name')">
+  <section class="field required" [class.error]="showFieldError('name')">
     <label>Name</label>
     <input
       ngrxField="name"
@@ -16,7 +16,7 @@
     <label class="error" *ngIf="showFieldError('name')">
       {{fieldErrors.name}}
     </label>
-  </div>
+  </section>
 
   <!-- Age number input -->
   <div class="field required" [class.error]="showFieldError('age')">

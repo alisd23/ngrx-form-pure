@@ -113,13 +113,17 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
   // Called after the child directives (and therefore all field directives) have initialised
   public ngAfterContentInit() {
     if (this.initialValues) {
-      delayAction(() => this.store.dispatch(
-        this.formActions.setInitialValues(this.initialValues)
-      ));
-    }
+      delayAction(() => {
+        this.store.dispatch(
+          this.formActions.setInitialValues(this.initialValues)
+        );
 
-    if (this.fieldValidators) {
-      this.updateFieldErrors(this.formState);
+        // Can only updateFieldErrors after all fields have been registered - so
+        // we need to wait till initial change detection phase has ended. 
+        if (this.fieldValidators) {
+          this.updateFieldErrors(this.formState);
+        }
+      });
     }
   }
 
