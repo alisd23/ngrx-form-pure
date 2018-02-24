@@ -1,6 +1,13 @@
+@import 'variables';
+
 .ui.form .field.error label.error {
   margin-top: 6px;
+
   &::after {
     display: none;
   }
+}
+
+.ui.form .grouped.fields.error > label {
+  color: $error;
 }

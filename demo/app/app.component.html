@@ -1,12 +1,31 @@
 <div class="app">
   <div class="app-main">
-    <h1 class="ui dividing header">
-      Ngrx Form Demo
-    </h1>
-    <app-user-form></app-user-form>
+    <div class="app-main-inner">
+      <h1 class="ui dividing header">
+        Ngrx Form Demo
+      </h1>
+      <app-user-form></app-user-form>
+    </div>
   </div>
   <div class="app-sidebar">
     <h3>Current State</h3>
-    {{state$ | async}}
+    <small>See console for store actions</small>
+    <div class="ui three item menu">
+      <a
+        *ngFor="let mode of viewModes"
+        class="item"
+        [class.active]="viewMode === mode.type"
+        (click)="onModeChange(mode.type)"
+      >
+        {{mode.label}}
+      </a>
+    </div>
+    <pre>
+<code
+  mwlHighlightJs
+  [source]="formattedState"
+  language="javascript"
+></code>
+    </pre>
   </div>
 </div>

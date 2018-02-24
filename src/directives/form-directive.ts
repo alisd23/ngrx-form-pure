@@ -99,7 +99,9 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
     // When fields state updates and when form initialises - perform field validation
     const errorCheckActionTypes = [
       ActionConstants.CHANGE_FIELD,
-      ActionConstants.INIT_FORM
+      ActionConstants.INIT_FORM,
+      ActionConstants.RESET_FORM,
+      ActionConstants.RESET_FIELD
     ] as string[];
 
     const actionSubscription = this.actions$
@@ -119,7 +121,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
         );
 
         // Can only updateFieldErrors after all fields have been registered - so
-        // we need to wait till initial change detection phase has ended. 
+        // we need to wait till initial change detection phase has ended.
         if (this.fieldValidators) {
           this.updateFieldErrors(this.formState);
         }

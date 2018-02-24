@@ -6,7 +6,7 @@
   [initialValues]="initialValues"
 >
   <!-- Name string input -->
-  <section class="field required" [class.error]="showFieldError('name')">
+  <div class="field required" [class.error]="showFieldError('name')">
     <label>Name</label>
     <input
       ngrxField="name"
@@ -16,7 +16,7 @@
     <label class="error" *ngIf="showFieldError('name')">
       {{fieldErrors.name}}
     </label>
-  </section>
+  </div>
 
   <!-- Age number input -->
   <div class="field required" [class.error]="showFieldError('age')">
@@ -46,7 +46,7 @@
   </div>
 
   <!-- Bands radio button group -->
-  <div class="grouped fields">
+  <div class="grouped fields" [class.error]="showFieldError('favouriteBand', false)">
     <label for="fruit">Favourite Band</label>
 
     <div *ngFor="let band of bands" class="field">
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <label class="error" *ngIf="showFieldError('favouriteBand')">
+    <label class="error" *ngIf="showFieldError('favouriteBand', false)">
       {{fieldErrors.favouriteBand}}
     </label>
   </div>
@@ -89,12 +89,14 @@
   </div>
 
   <!-- Custom "genres" multiselect component -->
-  <h3>Music genres</h3>
-  <app-genre-multiselect></app-genre-multiselect>
+  <div class="field" [class.error]="showFieldError('genres')">
+    <label>Music genres</label>
+    <app-genre-multiselect></app-genre-multiselect>
+  </div>
 
   <!-- Terms & conditions checkbox -->
-  <h3>Accept terms &amp; conditions?</h3>
-  <div>
+  <div class="field" [class.error]="showFieldError('terms')">
+    <label>Terms &amp; Conditions</label>
     <input
       ngrxField="terms"
       type="checkbox"
@@ -107,14 +109,17 @@
   <button
     type="submit"
     [disabled]="formState && formState.invalid"
+    class="ui primary button"
+    [class.loading]="loading"
   >
     Submit
   </button>
-  <div *ngIf="loading">
-    ...LOADING...
-  </div>
 
-  <button (click)="onReset()">
+  <button
+    (click)="onReset()"
+    type="button"
+    class="ui button"
+  >
     Reset Form
   </button>
 </form>

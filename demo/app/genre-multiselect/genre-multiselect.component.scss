@@ -1,20 +1,23 @@
+@import 'variables';
+
 .multiselect {
-  border: 1px solid #ddd;
-  
+  margin-top: 10px;
+  border: 1px solid $grey-light;
+
   .multiselect-item {
     padding: 6px 10px;
     cursor: pointer;
 
     &:hover {
-      background-color: #eee;
+      background-color: #grey-lighter;
     }
 
     &.selected {
-      background-color: lightcoral;
+      background-color: $teal;
       color: white;
 
       &:hover {
-        background-color: darken(lightcoral, 5);
+        background-color: darken($teal, 5);
       }
     }
   }

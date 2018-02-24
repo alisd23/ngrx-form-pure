@@ -3,8 +3,6 @@
 $container-padding: 30px 40px;
 
 .app {
-  width: 1200px;
-  max-width: 100%;
   height: 100vh;
   margin: 0 auto;
   display: flex;
@@ -17,14 +15,29 @@ $container-padding: 30px 40px;
   .app-main {
     flex: 1;
     overflow: auto;
-    height: 100%;
+  }
+
+  .app-main-inner {
+    max-width: 800px;
+    margin: 0 auto;
     padding: $container-padding;
   }
 
   .app-sidebar {
-    flex: 0 0 320px;
+    flex: 0 0 440px;
+    overflow: auto;
     height: 100%;
     padding: $container-padding;
     border-left: 1px solid $grey-lighter;
+
+    small {
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    code {
+      font-size: 12px;
+    }
   }
+
 }

@@ -56,13 +56,13 @@ export class UserFormComponent {
     return Band[band];
   }
 
-  public showFieldError(fieldName: keyof UserFormShape) {
+  public showFieldError(fieldName: keyof UserFormShape, mustBeTouched = true) {
     const isFieldTouched = (
       this.formState &&
       this.formState.fields[fieldName] &&
       this.formState.fields[fieldName].touched
     ) || false;
-    return isFieldTouched && this.fieldErrors[fieldName];
+    return (!mustBeTouched || isFieldTouched) && this.fieldErrors[fieldName];
   }
 
   public isHobbyChecked = (hobby: Hobby) => (hobbies: Hobby[]) => {
@@ -84,14 +84,18 @@ export class UserFormComponent {
   }
 
   public onSubmit(values: UserFormShape) {
-    console.log('Submitted', values);
     this.loading = true;
     setTimeout(
       () => {
         this.loading = false;
-        console.log('Submit success')
+        // Need to complete current setTimeout so angular can update view (loading spinner
+        // for example), so we need another setTimeout here
+        setTimeout(() => alert(
+          'Form submitted with values:\n' +
+          JSON.stringify(values, null, 2)
+        ), 100);
       },
-      2000
+      1000
     )
   }
 
