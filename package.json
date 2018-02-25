@@ -19,7 +19,7 @@
     "build:lib": "rimraf dist && ng-packagr -p ./package.json",
     "test": "ng test --app src",
     "lint": "ng lint",
-    "cypress:run": "cypress run",
+    "cypress:run": "cypress run --record",
     "demo:serve-dist": "http-server demo-dist -p 4200",
     "integration:dev": "cypress open",
     "integration:ci": "npm run build:demo && node ./scripts/integration"
