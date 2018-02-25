@@ -19,18 +19,14 @@
     "build:lib": "rimraf dist && ng-packagr -p ./package.json",
     "test": "ng test --app src",
     "lint": "ng lint",
-    "integration": "ng e2e --app demo"
+    "cypress:run": "cypress run",
+    "demo:serve-dist": "http-server demo-dist -p 4200",
+    "integration:dev": "cypress open",
+    "integration:ci": "npm run build:demo && node ./scripts/integration"
   },
   "peerDependencies": {
     "@angular/core": ">=5.0.0 <6.0.0",
     "@ngrx/store": ">=5.0.0 <6.0.0"
-  },
-  "dependencies": {
-    "core-js": "^2.4.1",
-    "global": "^4.3.2",
-    "immer": "^0.8.4",
-    "typedoc": "^0.9.0",
-    "zone.js": "^0.8.14"
   },
   "devDependencies": {
     "@angular-devkit/schematics": "^0.0.42",
@@ -45,7 +41,9 @@
     "@angular/platform-browser": "~5.2.0",
     "@angular/platform-browser-dynamic": "~5.2.0",
     "@angular/router": "~5.2.0",
+    "@bahmutov/add-typescript-to-cypress": "^2.0.0",
     "@ngrx/store": "^5.0.0",
+    "@types/highlight.js": "^9.12.2",
     "@types/jasmine": "~2.8.0",
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~9.3.0",
@@ -53,6 +51,12 @@
     "codelyzer": "^4.1.0",
     "core-js": "^2.4.1",
     "cpr": "^3.0.0",
+    "cross-spawn": "^6.0.4",
+    "cypress": "^2.0.3",
+    "global": "^4.3.2",
+    "highlight.js": "^9.12.0",
+    "http-server": "^0.11.1",
+    "immer": "^0.8.4",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.0",
     "karma": "~2.0.0",
@@ -65,7 +69,7 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "ng-packagr": "2.0.0-rc.10",
     "ngrx-store-logger": "^0.2.0",
-    "protractor": "~5.2.0",
+    "npm-run-all": "^4.1.2",
     "rimraf": "^2.6.1",
     "rxjs": "^5.4.2",
     "ts-node": "~4.1.0",

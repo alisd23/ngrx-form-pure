@@ -15,4 +15,4 @@ addons:
 script:
   - yarn run lint
   - yarn run test --singleRun --browsers Chrome,Firefox
-  - yarn run integration
+  - yarn run integration:ci
