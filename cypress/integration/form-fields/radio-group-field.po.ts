@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 export class RadioGroupField {
   private fieldName: string;

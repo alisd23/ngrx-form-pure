@@ -61,3 +61,4 @@ dist/
 .ng_build/
 /src/@my
 demo-dist
+cypress/videos

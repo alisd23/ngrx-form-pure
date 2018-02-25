@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 export class CheckboxGroupField {
   private fieldName: string;

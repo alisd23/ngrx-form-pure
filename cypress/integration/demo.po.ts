@@ -1,4 +1,4 @@
-/// <reference types="Cypress" />
+/// <reference types="cypress" />
 
 import { TextField } from './form-fields/text-field.po';
 import { CustomMultiselectField } from './form-fields/custom-multiselect-field.po';
