@@ -41,7 +41,6 @@
     "@angular/platform-browser": "~5.2.0",
     "@angular/platform-browser-dynamic": "~5.2.0",
     "@angular/router": "~5.2.0",
-    "@bahmutov/add-typescript-to-cypress": "^2.0.0",
     "@ngrx/store": "^5.0.0",
     "@types/highlight.js": "^9.12.2",
     "@types/jasmine": "~2.8.0",

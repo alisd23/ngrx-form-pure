@@ -50,7 +50,7 @@
       "project": "src/tsconfig.spec.json"
     },
     {
-      "project": "cypress/tsconfig.json"
+      "project": "integration/tsconfig.json"
     }
   ],
   "test": {
