@@ -4,6 +4,9 @@ language: node_js
 node_js:
   - '8'
 
+env:
+  - CYPRESS_RECORD_KEY=cefbaffc-b9a9-4504-b88a-cbddc0729b84
+
 before_install:
   - export CHROME_BIN=chromium-browser
   - export DISPLAY=:99.0
