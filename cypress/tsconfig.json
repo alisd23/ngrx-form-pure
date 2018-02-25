@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../out-tsc/integration",
+    "outDir": "../out-tsc/cypress",
     "module": "commonjs",
     "target": "es5",
     "types": [
