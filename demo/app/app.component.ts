@@ -1,6 +1,5 @@
-import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
 import { getFormValues, getFieldErrors } from 'ngrx-form';
 
 import { AppState } from './app-store.module';
@@ -31,8 +30,7 @@ export class AppComponent implements OnInit {
   public viewModes = modes;
 
   constructor(
-    private store: Store<AppState>,
-    private changeDetectorRef: ChangeDetectorRef
+    private store: Store<AppState>
   ) {}
 
   public get formattedState() {
