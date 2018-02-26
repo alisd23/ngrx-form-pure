@@ -54,7 +54,6 @@
         <input
           ngrxField="favouriteBand"
           type="radio"
-          name="favouriteBand"
           [value]="band"
         />
         <label>{{getBandName(band) | titlecase}}</label>
@@ -75,8 +74,8 @@
         <input
           ngrxField="hobbies"
           [value]="hobby"
-          [valueMutator]="isHobbyChecked(hobby)"
-          [stateMutator]="onHobbyChange(hobby)"
+          [valueTransformer]="hobbyValueTransform"
+          [stateTransformer]="hobbyStateTransform"
           type="checkbox"
         />
         <label>{{hobby | titlecase}}</label>

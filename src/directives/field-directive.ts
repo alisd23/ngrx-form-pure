@@ -1,4 +1,4 @@
-import { Directive, Input, OnInit, OnDestroy, HostListener, Injector } from '@angular/core';
+import { Directive, Input, OnInit, OnDestroy, HostListener, Injector, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/filter';
@@ -23,8 +23,8 @@ export class FieldDirective implements OnInit, OnDestroy {
   @Input('ngrxField') fieldName: string;
   @Input('name') name: string;
   @Input('type') type: string;
-  @Input('stateMutator') stateMutator: (value: any, e: Event) => any;
-  @Input('valueMutator') valueMutator: (value: any) => any;
+  @Input('stateTransformer') stateTransformer: (value: any, e: Event) => any;
+  @Input('valueTransformer') valueTransformer: (value: any, element: HTMLInputElement) => any;
 
   private initialized = false;
   private fieldValue: any;
@@ -40,6 +40,7 @@ export class FieldDirective implements OnInit, OnDestroy {
     private formDirective: FormDirective,
     private store: Store<IStoreState>,
     private injector: Injector,
+    private elementRef: ElementRef
   ) {}
 
   @HostListener('focus')
@@ -61,7 +62,7 @@ export class FieldDirective implements OnInit, OnDestroy {
       this.store.dispatch(
         this.formActions.changeField(
           this.fieldName,
-          this.stateMutator ? this.stateMutator(newValue, e) : newValue
+          this.stateTransformer ? this.stateTransformer(newValue, e) : newValue
         )
       );
     }
@@ -89,7 +90,9 @@ export class FieldDirective implements OnInit, OnDestroy {
     const storeSubscription = this.store
       .select('form', this.formName, 'fields', this.fieldName, 'value')
       .subscribe((value) => {
-        const newValue = this.valueMutator ? this.valueMutator(value) : value;
+        const newValue = this.valueTransformer
+          ? this.valueTransformer(value, this.elementRef.nativeElement)
+          : value;
         this.fieldValue = newValue;
         this.fieldControl.onValueUpdate(newValue);
       });

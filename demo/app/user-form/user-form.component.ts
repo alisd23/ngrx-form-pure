@@ -65,22 +65,25 @@ export class UserFormComponent {
     return (!mustBeTouched || isFieldTouched) && this.fieldErrors[fieldName];
   }
 
-  public isHobbyChecked = (hobby: Hobby) => (hobbies: Hobby[]) => {
-    return hobbies && hobbies.indexOf(hobby) !== -1;
+  public hobbyValueTransform = (hobbies: Hobby[], element: HTMLInputElement) => {
+    return (
+      hobbies &&
+      hobbies.indexOf(element.value as Hobby) !== -1
+    );
   }
 
-  public onHobbyChange = (hobby: Hobby) =>
-    (checked: boolean, e: Event): UserFormShape['hobbies'] => {
-      const currentState = this.formState.fields.hobbies.value;
-      const newState = new Set(currentState);
+  public hobbyStateTransform = (checked: boolean, e: Event): Hobby[] => {
+    const currentState = this.formState.fields.hobbies.value;
+    const newState = new Set(currentState);
+    const hobby = (e.target as HTMLInputElement).value as Hobby;
 
-      if (checked) {
-        newState.add(hobby);
-      } else {
-        newState.delete(hobby);
-      }
+    if (checked) {
+      newState.add(hobby);
+    } else {
+      newState.delete(hobby);
+    }
 
-      return Array.from(newState);
+    return Array.from(newState);
   }
 
   public onSubmit(values: UserFormShape) {

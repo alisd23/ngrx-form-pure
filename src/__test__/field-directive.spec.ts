@@ -1,3 +1,5 @@
+/// <reference types="jasmine" />
+
 import { DebugElement } from '@angular/core';
 import { TestBed, ComponentFixture, async } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -210,9 +212,9 @@ describe('Field directive [ngrxField]', () => {
       expect(dispatchSpy).toHaveBeenCalledTimes(3);
     });
 
-    it('stateMutator mutates outgoing value when input value changes', () => {
+    it('stateTransformer mutates outgoing value when input value changes', () => {
       setupTest();
-      nameFieldDirective.stateMutator = (value) => `mutated: ${value}`;
+      nameFieldDirective.stateTransformer = (value) => `mutated: ${value}`;
       detectFormLifecycleActions(fixture);
 
       nameFieldDirective.onChange('bob', createFakeEvent('input'));
@@ -231,9 +233,9 @@ describe('Field directive [ngrxField]', () => {
       expect(dispatchSpy.calls.argsFor(3)).toEqual([fieldChangeAction]);
     });
 
-    it('valueMutator mutates new incoming value when the inputs\' value changes in state', () => {
+    it('valueTransformer mutates new incoming value when the inputs\' value changes in state', () => {
       setupTest();
-      nameFieldDirective.valueMutator = (stateValue) => `mutated: ${stateValue}`;
+      nameFieldDirective.valueTransformer = (stateValue) => `mutated: ${stateValue}`;
       detectFormLifecycleActions(fixture);
 
       const newState = {
