@@ -1,24 +1,24 @@
-export enum Colour {
-  red = 'red',
-  blue = 'blue',
-  green = 'green'
+import { IFormState } from 'ngrx-form';
+import { Colour, Band, Hobby, Genre } from './enums';
+
+// =========================//
+//       State Typings      //
+// =========================//
+
+export interface UserFormShape {
+  name: string;
+  age: string;
+  colour: Colour;
+  favouriteBand: Band;
+  hobbies: Hobby[];
+  terms: boolean;
+  genres: Genre[];
 }
 
-export enum Band {
-  smashMouth = 'smash mouth',
-  bagRaiders = 'bag raiders'
+export interface AppFormState {
+  newUser: IFormState<UserFormShape>;
 }
 
-export enum Hobby {
-  football = 'football',
-  tennis = 'tennis',
-  music = 'music'
-}
-
-export enum Genre {
-  pop = 'pop',
-  jazz = 'jazz',
-  rock = 'rock',
-  rap = 'rap',
-  classical = 'classical'
+export interface AppState {
+  form: AppFormState;
 }

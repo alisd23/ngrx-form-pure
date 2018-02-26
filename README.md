@@ -112,7 +112,7 @@ class UserForm {
 
 The state of any forms hooked up to `ngrx-form` will be stored in your global state tree in the following way:
 
-```typescript
+```ts
 // Example form shape:
 interface RootState {
   form: {
@@ -190,6 +190,8 @@ The following guides have been created with the goal to keep them as simple and 
 This is purely because the typings for the form state can be quite complex so for the purpose of keeping the example code small I have ommitted many typings.
 
 A full guide to achieving strong typing with this library can be found in the [TypeScript]('typescript') section.
+
+Or check out the [demo code](https://github.com/alisd23/ngrx-form/tree/master/demo) to see an example of strong typings with `ngrx-form`.
 
 ### Radio Input Group
 
@@ -306,7 +308,7 @@ class CheckboxGroupForm {
 ```
 
 See the demo for full examples of both radio button groups and checkbox groups [on GitHub](https://github.com/alisd23/ngrx-form/tree/master/demo/app/user-form).
-> See the demo running ([here](https://ngrx-form-demo.alisd.io))
+> See the demo running [here](https://ngrx-form-demo.alisd.io)
 
 ### Field validation
 

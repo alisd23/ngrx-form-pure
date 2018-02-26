@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getFormValues, getFieldErrors } from 'ngrx-form';
 
-import { AppState } from './app-store.module';
+import { AppState } from './types';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/do';

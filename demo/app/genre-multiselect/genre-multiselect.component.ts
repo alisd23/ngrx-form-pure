@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getFormActions, delayAction } from 'ngrx-form';
 
-import { AppFormState, AppState } from '../app-store.module';
-import { Genre } from '../types';
+import { AppFormState, AppState } from '../types';
+import { Genre } from '../enums';
 
 const userFormActions = getFormActions<AppFormState>('newUser');
 
