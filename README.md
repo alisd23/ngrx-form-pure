@@ -13,6 +13,28 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
 > I would recommend considering `@angular/forms` before deciding on this library, as
 > it may be all you need (and is probably richer in functionality).
 
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Getting Started](#getting-started)
+  - [Simple Form](#simple-form)
+  - [Form State](#form-state)
+  - [Selectors](#selectors)
+  - [Dispatching Form Actions](#dispatching-form-actions)
+  - [Typescript](#typescript)
+- [Guides](#guides)
+  - [Radio Input Group](#radio-input-group)
+  - [Checkbox Input Group](#checkbox-input-group)
+  - [Field Validation](#field-validation)
+  - [Submit Validation](#submit-validation)
+  - [Resetting a Form](#resetting-a-form)
+  - [Custom Form Controls](#custom-form-controls)
+- [API](#api)
+  - [ngrxForm](#ngrxForm)
+  - [ngrxField](#ngrxField)
+  - [Actions](#actions)
+  - [Selectors](#selectors)
+  - [Validators](#validators)
+- [Contributing & CI](#contributing-&-ci)
 
 ## Installation
 
@@ -183,6 +205,24 @@ const userFormValues$: Observable<IUserFormShape> = store
 ###### See the [selectors API](#state-selectors) for a list of all the available built-in selectors.
 
 
+### Dispatching Form Actions
+(Info on timings and order of form actions)
+Explain all form initialise phase actions must be delayed until AFTER the initial
+round of change detection, as to not cause updates within a change detection phase.
+- https://github.com/angular/angular/issues/6005#issuecomment-165905348
+-
+
+Order of actions in initialisation phase:
+- Form register (inside form ngOnInit)
+- Field register (inside field ngOnInit)
+- Set initial field values (inside form ngAfterContentInit)
+
+
+### TypeScript
+(Root Forms state)
+(Form Shape) => (Form State)
+
+
 ## Guides
 
 The following guides have been created with the goal to keep them as simple and isolated as possible, for the functional area in which the guide is targetting. This means there is a lot of loose typing (`any`'s everywhere...).
@@ -229,13 +269,20 @@ You'll notice both the `ngrxField` directive and `name` attribute have been set 
 
 Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [valueTransformer](#value-transformer) and [stateTransformer](#state-transformer) `fieldDirective` inputs.
 
-These *transformer* function inputs `valueTransformer` and `stateTransformer` transform the fields 'input value' and 'state value' respectively, **before** being set.
+These transformer function inputs `valueTransformer` and `stateTransformer` transform the fields *input value* and *state value* respectively, before being set:
 
-The type of the 'input value' returned from the `valueTransformer` passed into the `stateTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form`.
+```
++-----------+   valueTransformer(stateValue)     +-----------+
+|           |   ------------------------->>      |           |
+|   State   |                                    |   Input   |
+|           |   <<-------------------------      |           |
++-----------+   stateTransformer(inputValue)     +-----------+
+
+```
+
+The type of the *input value* returned from the `valueTransformer` passed into the `stateTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form`.
 - For **regular inputs, selects, and radio buttons**, they will be the inputs value, because these form fields normally correspond to a single `string` value.
 - For **checkboxes**, the type is a `boolean` - the checked status, which is what `ngrx-form` will store by default in state.
-
-For a full description on how to use these transform functions for each input type, see the [API](#value-transformer).
 
 **checkbox-group-form.component.html**
 ```html
@@ -289,8 +336,8 @@ class CheckboxGroupForm {
 
   // For checkboxes, the checked status is passed into the stateTransformer.
   // The return value is the value which should be stored in state. This let's us
-  // aggregate the selected checkbox values in the state, as a string array.
-  // NOTE: this return value can actually be anything you want
+  // aggregate the selected checkbox values in the state, as a string array of the
+  // selected checkbox values (NOTE: this return value can actually be anything you want)
   public fruitStateTransform = (checked: boolean, e: Event): string[] => {
     const currentState = this.formState.fields.fruits.value;
     const newState = new Set(currentState);
@@ -306,6 +353,10 @@ class CheckboxGroupForm {
   }
 }
 ```
+
+For a full description on how to use these transform functions for each input type, see the [API](#value-transformer).
+
+---
 
 See the demo for full examples of both radio button groups and checkbox groups [on GitHub](https://github.com/alisd23/ngrx-form/tree/master/demo/app/user-form).
 > See the demo running [here](https://ngrx-form-demo.alisd.io)
@@ -386,33 +437,71 @@ Currently there is only one validator provided from `ngrx-form` (but happy to ac
 See the [API](#provided-validators) for the current list of provided validators, and their signatures.
 
 ### Submit validation
-(No built-in state support)
-(Example showing onSubmit handler)
 
-### Resetting form
-(Reset form action)
+There is currently no built-in logic or form state to handle submit validation (errors, loading etc...), but this can be fairly easily implemented for the simple case.
+
+> However if there is interest this could be implemented.
+
+Below is an example of a form component implementing a simple loading & validation flow, with just a single *submit error* to represent whether or not the request was successful.
+
+**user-form.component.html**
+```html
+<form ngrxForm="userForm" (ngrxSubmit)="onSubmit($event)">
+  <input ngrxField="name" />
+  <input ngrxField="age" />
+  <span *ngIf="error">{{error}}</span>
+  <button
+    type="submit"
+    [disabled]="loading"
+    [class.loading]="loading"
+  >
+    Create User
+  </button>
+</form>
+```
+
+**user-form.component.ts**
+```ts
+import { Store } from '@ngrx/store';
+
+interface IUserFormShape {
+  name: string;
+  age: string;
+}
+
+@Component({
+  selector: 'user-form',
+  templateUrl: './user-form.component.html'
+})
+class UserForm {
+  public loading = false;
+  public error: string = null;
+
+  public onSubmit(values: IUserFormShape) {
+    this.loading = true;
+    this.error = null;
+
+    somePostRequestFunction('/new-user', values)
+      .then(() => {
+        this.loading = false;
+      })
+      .catch((error: string) => {
+        this.loading = false;
+        this.error = error;
+      });
+  }
+}
+```
+
+### Resetting a form
+
+Resetting a form requires a `RESET_FORM` action type be fired.
+
+See the [Actions API](#form-actions) for information on this.
 
 ### Custom Form Controls
 (Action flow - initField, changeField, focusField etc...)
 Link to
-
-
-## Dispatching Form Actions
-(Info on timings and order of form actions)
-Explain all form initialise phase actions must be delayed until AFTER the initial
-round of change detection, as to not cause updates within a change detection phase.
-- https://github.com/angular/angular/issues/6005#issuecomment-165905348
--
-
-Order of actions in initialisation phase:
-- Form register (inside form ngOnInit)
-- Field register (inside field ngOnInit)
-- Set initial field values (inside form ngAfterContentInit)
-
-
-## TypeScript
-(Root Forms state)
-(Form Shape) => (Form State)
 
 
 ## API
@@ -437,17 +526,17 @@ Order of actions in initialisation phase:
 
 ---
 
-### Form Store Actions
+### Actions
 (List of actions - parameters, return types)
 
 ---
 
-### State Selectors
+### Selectors
 (getFormValues)
 (getFormErrors)
 (isFormPristine)
 
-### Provided Validators
+### Validators
 
 
 ## Contributing & CI
