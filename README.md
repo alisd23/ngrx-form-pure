@@ -18,7 +18,7 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [Getting Started](#getting-started)
   - [Simple Form](#simple-form)
   - [Form State](#form-state)
-  - [Selectors](#selectors)
+  - [Built-in Selectors](#built-in-selectors)
   - [Dispatching Form Actions](#dispatching-form-actions)
   - [Typescript](#typescript)
 - [Guides](#guides)
@@ -34,7 +34,7 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [Actions](#actions)
   - [Selectors](#selectors)
   - [Validators](#validators)
-- [Contributing & CI](#contributing-&-ci)
+- [Contributing & CI](#contributing--ci)
 
 ## Installation
 
@@ -267,7 +267,7 @@ You'll notice both the `ngrxField` directive and `name` attribute have been set 
 
 ### Checkbox Input Group
 
-Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [valueTransformer](#value-transformer) and [stateTransformer](#state-transformer) `fieldDirective` inputs.
+Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [valueTransformer](#value-transformer) and [stateTransformer](#state-transformer) inputs for any `ngrxField` elements.
 
 These transformer function inputs `valueTransformer` and `stateTransformer` transform the fields *input value* and *state value* respectively, before being set:
 
@@ -495,7 +495,7 @@ class UserForm {
 
 ### Resetting a form
 
-Resetting a form requires a `RESET_FORM` action type be fired.
+Resetting a form requires a `RESET_FORM` action to be fired.
 
 See the [Actions API](#form-actions) for information on this.
 

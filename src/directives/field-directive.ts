@@ -2,10 +2,11 @@ import { Directive, Input, OnInit, OnDestroy, HostListener, Injector, ElementRef
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/pluck';
 
 import { FormDirective } from './form-directive';
 import { RadioFieldControl, CheckboxFieldControl, DefaultFieldControl } from './field-controls';
-import { IFieldControl, IStoreState } from '../types';
+import { IFieldControl, IStoreState, IFormState } from '../types';
 import { getFormActions, FormActions } from '../actions';
 import { delayAction } from '../utils/angular';
 
@@ -68,6 +69,14 @@ export class FieldDirective implements OnInit, OnDestroy {
     }
   }
 
+  private onStateValueUpdate(value: any) {
+    const newValue = this.valueTransformer
+      ? this.valueTransformer(value, this.elementRef.nativeElement)
+      : value;
+    this.fieldValue = newValue;
+    this.fieldControl.onValueUpdate(newValue);
+  }
+
   public ngOnInit() {
     this.formActions = getFormActions(this.formName);
 
@@ -87,15 +96,18 @@ export class FieldDirective implements OnInit, OnDestroy {
       this.formActions.registerField(this.fieldName)
     ));
 
+    // Try to reduce flashing of values by using initialValues to set input value as
+    // as soon as possible - instead of waiting for state to initialise.
+    const { initialValues } = this.formDirective;
+    if (initialValues && initialValues[this.fieldName] !== undefined) {
+      this.onStateValueUpdate(initialValues[this.fieldName]);
+    }
+
     const storeSubscription = this.store
-      .select('form', this.formName, 'fields', this.fieldName, 'value')
-      .subscribe((value) => {
-        const newValue = this.valueTransformer
-          ? this.valueTransformer(value, this.elementRef.nativeElement)
-          : value;
-        this.fieldValue = newValue;
-        this.fieldControl.onValueUpdate(newValue);
-      });
+      .select('form', this.formName)
+      .filter(Boolean)
+      .pluck<IFormState<any>, any>('fields', this.fieldName, 'value')
+      .subscribe((value) => this.onStateValueUpdate(value));
 
     this.subscriptions.push(storeSubscription);
     this.initialized = true;
