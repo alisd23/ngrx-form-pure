@@ -212,9 +212,9 @@ describe('Field directive [ngrxField]', () => {
       expect(dispatchSpy).toHaveBeenCalledTimes(3);
     });
 
-    it('stateTransformer mutates outgoing value when input value changes', () => {
+    it('stateValueTransformer mutates outgoing value when input value changes', () => {
       setupTest();
-      nameFieldDirective.stateTransformer = (value) => `mutated: ${value}`;
+      nameFieldDirective.stateValueTransformer = (value) => `mutated: ${value}`;
       detectFormLifecycleActions(fixture);
 
       nameFieldDirective.onChange('bob', createFakeEvent('input'));
@@ -233,9 +233,9 @@ describe('Field directive [ngrxField]', () => {
       expect(dispatchSpy.calls.argsFor(3)).toEqual([fieldChangeAction]);
     });
 
-    it('valueTransformer mutates new incoming value when the inputs\' value changes in state', () => {
+    it('elementValueTransformer mutates new incoming value when the inputs\' value changes in state', () => {
       setupTest();
-      nameFieldDirective.valueTransformer = (stateValue) => `mutated: ${stateValue}`;
+      nameFieldDirective.elementValueTransformer = (stateValue) => `mutated: ${stateValue}`;
       detectFormLifecycleActions(fixture);
 
       const newState = {

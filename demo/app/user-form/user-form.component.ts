@@ -65,14 +65,14 @@ export class UserFormComponent {
     return (!mustBeTouched || isFieldTouched) && this.fieldErrors[fieldName];
   }
 
-  public hobbyValueTransform = (hobbies: Hobby[], element: HTMLInputElement) => {
+  public hobbyElementValueTransform = (hobbies: Hobby[], element: HTMLInputElement) => {
     return (
       hobbies &&
       hobbies.indexOf(element.value as Hobby) !== -1
     );
   }
 
-  public hobbyStateTransform = (checked: boolean, e: Event): Hobby[] => {
+  public hobbyStateValueTransform = (checked: boolean, e: Event): Hobby[] => {
     const currentState = this.formState.fields.hobbies.value;
     const newState = new Set(currentState);
     const hobby = (e.target as HTMLInputElement).value as Hobby;

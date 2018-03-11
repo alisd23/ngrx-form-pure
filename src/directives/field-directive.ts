@@ -24,8 +24,8 @@ export class FieldDirective implements OnInit, OnDestroy {
   @Input('ngrxField') fieldName: string;
   @Input('name') name: string;
   @Input('type') type: string;
-  @Input('stateTransformer') stateTransformer: (value: any, e: Event) => any;
-  @Input('valueTransformer') valueTransformer: (value: any, element: HTMLInputElement) => any;
+  @Input('stateValueTransformer') stateValueTransformer: (elementValue: any, e: Event) => any;
+  @Input('elementValueTransformer') elementValueTransformer: (stateValue: any, element: HTMLInputElement) => any;
 
   private initialized = false;
   private fieldValue: any;
@@ -63,15 +63,15 @@ export class FieldDirective implements OnInit, OnDestroy {
       this.store.dispatch(
         this.formActions.changeField(
           this.fieldName,
-          this.stateTransformer ? this.stateTransformer(newValue, e) : newValue
+          this.stateValueTransformer ? this.stateValueTransformer(newValue, e) : newValue
         )
       );
     }
   }
 
   private onStateValueUpdate(value: any) {
-    const newValue = this.valueTransformer
-      ? this.valueTransformer(value, this.elementRef.nativeElement)
+    const newValue = this.elementValueTransformer
+      ? this.elementValueTransformer(value, this.elementRef.nativeElement)
       : value;
     this.fieldValue = newValue;
     this.fieldControl.onValueUpdate(newValue);

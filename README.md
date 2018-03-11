@@ -19,7 +19,6 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [Simple Form](#simple-form)
   - [Form State](#form-state)
   - [Built-in Selectors](#built-in-selectors)
-  - [Dispatching Form Actions](#dispatching-form-actions)
   - [Typescript](#typescript)
 - [Guides](#guides)
   - [Radio Input Group](#radio-input-group)
@@ -29,8 +28,8 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [Resetting a Form](#resetting-a-form)
   - [Custom Form Controls](#custom-form-controls)
 - [API](#api)
-  - [ngrxForm](#ngrxForm)
-  - [ngrxField](#ngrxField)
+  - [ngrxForm](#ngrxform)
+  - [ngrxField](#ngrxfield)
   - [Actions](#actions)
   - [Selectors](#selectors)
   - [Validators](#validators)
@@ -205,23 +204,58 @@ const userFormValues$: Observable<IUserFormShape> = store
 ###### See the [selectors API](#state-selectors) for a list of all the available built-in selectors.
 
 
-### Dispatching Form Actions
-(Info on timings and order of form actions)
-Explain all form initialise phase actions must be delayed until AFTER the initial
-round of change detection, as to not cause updates within a change detection phase.
-- https://github.com/angular/angular/issues/6005#issuecomment-165905348
--
-
-Order of actions in initialisation phase:
-- Form register (inside form ngOnInit)
-- Field register (inside field ngOnInit)
-- Set initial field values (inside form ngAfterContentInit)
-
-
 ### TypeScript
-(Root Forms state)
-(Form Shape) => (Form State)
 
+This library has been designed to provide as strong typings as possible, if you want that (you could always just use `any`).
+
+There is some basic terminology used in the typings, and in these docs.
+
+#### Form 'Shape'
+
+This basically represents the value types for the fields in the form, for example:
+
+```ts
+interface UserFormShape {
+  name: string;
+  age: string;
+}
+```
+
+> Note: Number inputs would still have a string value unless tranformed with the
+> [elementValueTransformer](#element-value-transformer) or [stateValueTransformer](#statevaluetransformer-value-any-e-event-any) property inputs.
+
+#### Root/App 'form state'
+
+This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to use the `?` symbol for any form keys which are dynamically created/destroyed (i.e. do not always exist in your app), as the form state for these forms could be `undefined`.
+
+Some generic interfaces in `ngrx-form` will require this type to be passed as a generic parameter, mainly to restrict which string values can be passed in as *form name* parameters
+
+```ts
+import { IFormState } from 'ngrx-form';
+
+interface RootFormState {
+  newUser?: IFormState<UserFormShape>;
+}
+```
+
+An example of this interface being used is when calling `getFormActions`
+
+```ts
+import { getFormActions } from 'ngrx-form'
+
+// Will PASS type check
+const formActions = getFormActions<RootFormState>('newUser');
+// Will FAIL type check - 'nonExistentForm' is not a valid form name
+const formActions = getFormActions<RootFormState>('nonExistentForm');
+```
+
+The root form state type can then be used when defining your top level 'App state' type:
+
+```ts
+interface IAppState {
+  form: RootFormState
+}
+```
 
 ## Guides
 
@@ -267,20 +301,20 @@ You'll notice both the `ngrxField` directive and `name` attribute have been set 
 
 ### Checkbox Input Group
 
-Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [valueTransformer](#value-transformer) and [stateTransformer](#state-transformer) inputs for any `ngrxField` elements.
+Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [elementValueTransformer](#elementvaluetransformer) and [stateValueTransformer](#statevaluetransformer-value-any-e-event-any) inputs for any `ngrxField` elements.
 
-These transformer function inputs `valueTransformer` and `stateTransformer` transform the fields *input value* and *state value* respectively, before being set:
-
-```
-+-----------+   valueTransformer(stateValue)     +-----------+
-|           |   ------------------------->>      |           |
-|   State   |                                    |   Input   |
-|           |   <<-------------------------      |           |
-+-----------+   stateTransformer(inputValue)     +-----------+
+These transformer function inputs `elementValueTransformer` and `stateValueTransformer` intercept the new value about to be set for the fields *element value* and *state value* respectively, and transform them before being set:
 
 ```
++-----------+   elementValueTransformer(stateValue)   +-----------+
+|           |   -------------------------------->>    |           |
+|   State   |                                         |   Input   |
+|           |   <<--------------------------------    |           |
++-----------+   stateValueTransformer(inputValue)     +-----------+
 
-The type of the *input value* returned from the `valueTransformer` passed into the `stateTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form`.
+```
+
+The type of the *input value* returned from the `elementValueTransformer` passed into the `stateValueTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form`.
 - For **regular inputs, selects, and radio buttons**, they will be the inputs value, because these form fields normally correspond to a single `string` value.
 - For **checkboxes**, the type is a `boolean` - the checked status, which is what `ngrx-form` will store by default in state.
 
@@ -291,16 +325,16 @@ The type of the *input value* returned from the `valueTransformer` passed into t
     ngrxField="fruits"
     name="fruits"
     value="apple"
-    [valueTransformer]="fruitValueTransform"
-    [stateTransformer]="fruitStateTransform"
+    [elementValueTransformer]="fruitElementValueTransform"
+    [stateValueTransformer]="fruitStateValueTransform"
     type="checkbox"
   />
   <input
     ngrxField="fruits"
     name="fruits"
     value="orange"
-    [valueTransformer]="fruitValueTransform"
-    [stateTransformer]="fruitStateTransform"
+    [elementValueTransformer]="fruitElementValueTransform"
+    [stateValueTransformer]="fruitStateValueTransform"
     type="checkbox"
   />
 </form>
@@ -327,18 +361,18 @@ class CheckboxGroupForm {
 
   // Return whether or not the checkbox should be checked. Ngrx-form will then set
   // the inputs checked value appropriately.
-  public fruitValueTransform = (fruits: string[], element: HTMLInputElement) => {
+  public fruitElementValueTransform = (fruits: string[], element: HTMLInputElement) => {
     return (
       fruits &&
       fruits.indexOf(element.value) !== -1
     );
   }
 
-  // For checkboxes, the checked status is passed into the stateTransformer.
+  // For checkboxes, the checked status is passed into the stateValueTransformer.
   // The return value is the value which should be stored in state. This let's us
   // aggregate the selected checkbox values in the state, as a string array of the
   // selected checkbox values (NOTE: this return value can actually be anything you want)
-  public fruitStateTransform = (checked: boolean, e: Event): string[] => {
+  public fruitStateValueTransform = (checked: boolean, e: Event): string[] => {
     const currentState = this.formState.fields.fruits.value;
     const newState = new Set(currentState);
     const fruitName = (e.target as HTMLInputElement).value;
@@ -500,29 +534,194 @@ Resetting a form requires a `RESET_FORM` action to be fired.
 See the [Actions API](#form-actions) for information on this.
 
 ### Custom Form Controls
-(Action flow - initField, changeField, focusField etc...)
-Link to
+
+It is possible to create custom form controls, which can follow the same lifecycle and state changes as built-form form fields.
+
+**Delaying Actions**
+
+It's important to note at this point that some *intialisation* actions must be **delayed** until **after** the inital change detection phase. This is due to the angular lifecycle and the fact that 'state changes' can not (or should not) occur in the middle of a change detection cycle.
+
+This delay can be done easily with the `delayAction` function exposed by this library, which is literally just a wrapper around `setTimeout(func, 0)`.
+
+```ts
+import { delayAction, getFormActions } from 'ngrx-form';
+
+const someFormActions = getFormActions<any>('someForm');
+
+delayAction(() => {
+  this.store.dispatch(someFormActions.registerField('someField'));
+});
+```
+
+See [this issue](https://github.com/angular/angular/issues/6005#issuecomment-165905348) for more on this.
+
+#### Simple example
+
+The following example shows a simple name input component, which showcases how to initialise a custom form control correctly.
+
+For a real working example of a custom form control, see the [demo multiselect component](https://github.com/alisd23/ngrx-form/tree/master/demo/app/genre-multiselect).
+
+> **NOTE**
+> The `focus` and `blur` actions are not *required* have been included for the sake of the example.
+
+**user-name-control.component.html**
+```html
+<div class="user-name">
+  <input
+    #input
+    [value]="value"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    (input)="onValueChange(input.value)"
+  />
+<div>
+```
+
+**user-name-control.component.ts**
+```ts
+import { getFormActions } from 'ngrx-form';
+
+// 'newUser' is the name of the form this component belongs to.
+const userFormActions = getFormActions('newUser');
+
+@Component({
+  selector: 'app-user-name-control',
+  templateUrl: './user-name-control.component.html'
+})
+export class UserNameComponent implements OnInit, OnDestroy {
+  // Default to something sensible whilst form/fields are initialising
+  public value: string;
+
+  constructor(private store: Store<any>) {}
+
+  public onValueChange(newValue: string) {
+    this.store.dispatch(
+      userFormActions.changeField('name', newValue)
+    ));
+  }
+
+  public onFocus() {
+    this.store.dispatch(userFormActions.focusField('name'));
+  }
+
+  public onBlur() {
+    this.store.dispatch(userFormActions.blurField('name'));
+  }
+
+  public ngOnInit() {
+    delayAction(() => this.store.dispatch(
+      userFormActions.registerField('name')
+    ));
+
+    // Subscribe to
+    this.store
+      .select('form', 'newUser', 'fields', 'name', 'value')
+      // Don't want to set values whilst form is initialising, as value will be
+      // undefined/null
+      .filter(value => Boolean(value))
+      .subscribe(values => {
+        this.values = values
+      });
+  }
+
+  public ngOnDestroy() {
+    delayAction(() => this.store.dispatch(
+      userFormActions.unregisterField('genres')
+    ));
+  }
+}
+```
+
+The following list explains the actions which you can/need to dispatch when creating a custom form field control, when to dispatch them, and what their purpose is.
+
+Given `formActions` is the object returned by calling `getFormActions(:formName:)`.
+
+##### `formActions.registerField(fieldName)`
+ Creates the initial field object in `ngrx` state.
+- Fire in the field components' `ngOnInit` lifecycle hook.
+- Needs delaying with `delayAction`
+- **Required**
+
+##### `formActions.unregisterField(fieldName)`
+Removes this field from `ngrx` state if no other fields still exist with the same field name.
+- Fire in the field components' `ngOnDestroy` lifecycle hook.
+- Needs delaying with `delayAction`
+- **Required**
+
+##### `formActions.changeField(fieldName, newValue)`
+Updates the `value` of the field.
+
+##### `formActions.focusField(fieldName)`
+Sets the `focus` value of the field state to `true`.
+
+##### `formActions.blurField(fieldName)`
+Sets the `focus` value of the field state to `false`.
+
+##### `formActions.resetField(fieldName)`
+Resets the state of the field (i.e. value, focus, etc...).
 
 
 ## API
 
-### ngrxForm
+### [ngrxForm]
+
+The directive used to sync your `form` element to `@ngrx/store` state.
 
 #### Inputs
 
-##### `fieldValidators: { [string: fieldName]: IValidator[] }`
+##### `[ngrxForm]`: `string` [required]
+The value for the `[ngrxForm]` directive itself. Defines the name of the key used under the root form state, in which the form state will be stored.
+
+##### `[fieldValidators]: { [string: fieldName]: IValidator[] }` (optional)
+A key-value object of field name to an array of validator functions.
+See the [validation](#field-validation) section for more information.
+
+##### `[initialValues]`: `{ [string: fieldName]: any }` (optional)
+The initial values that the fields should take. These values will be set when each respective field is registered, when it is reset, and when the whole form is reset.
+
+> **Note**
+> The type for this input is actually the *shape* of the form, which depends on your form field value types. See the [TypeScript](#typescript) section for more.
 
 #### Outputs
 
----
+##### `(ngrxSubmit)`: `{ [string: fieldName]: any`
+Emits a key-value object of field name to current value when the form element with the `[ngrxForm]` directive attached submits.
 
-### ngrxField
+> **Note**
+> The type for this input is actually the *shape* of the form, which depends on your form field value types. See the [TypeScript](#typescript) section for more.
+
+You can also still listen to the raw form `submit` event if you need to, but this output is a nicer way of getting the final form values on submit.
+
+### [ngrxField]
+
+The directive used to register and sync a form field element (`input`, `select`, etc.) to the form of the nearest `[ngrxForm]` parent. 
 
 #### Inputs
 
-##### `valueTransformer(transformFunc: Function)`
+##### `[ngrxField]`: *`string`*
+The value for the `[ngrxField]` directive itself. Defines the name of the key used under the form state, in which the field state will be stored.
 
-#### Outputs
+##### `[name]`: *`string`*
+Just the raw element `name` attribute. This is still applied as a regular `name` attribute to the element, but is also needed by `ngrx-form` internally.
+
+##### `[type]`: *`string`*
+Just the raw element `type` attribute. This is still applied as a regular `type` attribute on the element, but is also needed by `ngrx-form` internally.
+
+##### `[stateValueTransformer]`: *`(value: any, e: Event) => any`*
+A **state value transformer** function is called when the field's **DOM** value changes. Value returned from this function is what the field's **state** value will be set to.
+
+The value passed in to this function depends on the `type` of the field element.
+See [this section](#checkbox-input-group) for more information.
+
+It is named as such because it is *transforming* the new *state* value for the given field, before it is set.
+
+##### `[elementValueTransformer]`: *`(value: any, element: HTMLInputElement) => any`*
+An **element value transformer** function is called when the field's **state** value changes. The value returned from this function is what the field's **DOM** value will be set to.
+
+The return value required depends on the `type` of the field element.
+See [this section](#checkbox-input-group) for more information.
+
+It is named as such because it is *transforming* the new *state* value for the given field, before it is set.
 
 ---
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { getFormActions, delayAction } from 'ngrx-form';
 
@@ -12,7 +12,7 @@ const userFormActions = getFormActions<AppFormState>('newUser');
   templateUrl: './genre-multiselect.component.html',
   styleUrls: ['./genre-multiselect.component.scss']
 })
-export class GenreMultiselectComponent implements OnInit {
+export class GenreMultiselectComponent implements OnInit, OnDestroy {
   public store: Store<AppState>;
   // Default to something sensible whilst form/fields are initialising
   public values: Genre[] = [];
@@ -56,5 +56,11 @@ export class GenreMultiselectComponent implements OnInit {
       // undefined/null
       .filter(value => Boolean(value))
       .subscribe(values => this.values = values);
+  }
+
+  public ngOnDestroy() {
+    delayAction(() => this.store.dispatch(
+      userFormActions.unregisterField('genres')
+    ));
   }
 }

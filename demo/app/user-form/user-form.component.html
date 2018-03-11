@@ -74,8 +74,8 @@
         <input
           ngrxField="hobbies"
           [value]="hobby"
-          [valueTransformer]="hobbyValueTransform"
-          [stateTransformer]="hobbyStateTransform"
+          [elementValueTransformer]="hobbyElementValueTransform"
+          [stateValueTransformer]="hobbyStateValueTransform"
           type="checkbox"
         />
         <label>{{hobby | titlecase}}</label>
