@@ -57,6 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+.vscode
+
 dist/
 .ng_build/
 /src/@my

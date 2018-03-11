@@ -7,7 +7,7 @@ type RootFormsState = IRootState['form'];
 
 const TEST_FORM_NAME = 'test';
 
-const formActions = getFormActions<RootFormsState>(TEST_FORM_NAME);
+const formActions = getFormActions<RootFormsState>()(TEST_FORM_NAME);
 
 /**
  * The following tests run in sequence and all have dependencies on the previous tests.

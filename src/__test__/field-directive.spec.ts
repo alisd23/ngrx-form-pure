@@ -248,7 +248,7 @@ describe('Field directive [ngrxField]', () => {
           }
         }
       }
-      store.subject$.next(newState);
+      store.next(newState);
       fixture.detectChanges();
 
       expect(nameField.nativeElement.value).toBe('mutated: jen');

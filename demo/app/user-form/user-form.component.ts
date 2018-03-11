@@ -5,7 +5,7 @@ import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormStat
 import { AppFormState, UserFormShape, AppState } from '../types';
 import { Colour, Band, Hobby } from '../enums';
 
-const userFormActions = getFormActions<AppFormState>('newUser');
+const userFormActions = getFormActions<AppFormState>()('newUser');
 
 @Component({
   selector: 'app-user-form',

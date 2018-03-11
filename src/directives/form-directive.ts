@@ -5,13 +5,19 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 
 import { IFormState, IFieldValidators, IStoreState } from '../types';
-import { getFormActions, FormActions, ActionConstants } from '../actions';
+import { getFormActions, IFormActions, ActionConstants } from '../actions';
 import { getFormValues } from '../selectors';
 import { delayAction } from '../utils/angular';
 
 import 'rxjs/add/operator/filter';
 
-
+/**
+ * [ngrxForm] directive
+ * Handles the actions/logic relating to a single form, i.e. initialising, destroying,
+ * errors, reset, etc...
+ * The following actions need delaying until after change detection cycle:
+ * [initForm, registerForm, setInitialValues]
+ */
 @Directive({
   selector: '[ngrxForm]'
 })
@@ -22,7 +28,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
 
   @Output('ngrxSubmit') public submit = new EventEmitter();
 
-  private formActions: FormActions<any, any>;
+  private formActions: IFormActions<any, any>;
   private subscriptions: Subscription[] = [];
 
   public initialized = false;
@@ -87,7 +93,7 @@ export class FormDirective implements OnInit, OnDestroy, AfterContentInit {
    * Set up observable subscriptions (form state, actions, events etc...)
    */
   public ngOnInit() {
-    this.formActions = getFormActions(this.formName);
+    this.formActions = getFormActions()(this.formName);
 
     // Initialise form state
     delayAction(() => this.store.dispatch(this.formActions.initForm()));

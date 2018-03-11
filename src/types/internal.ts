@@ -1,13 +1,9 @@
 import { OnDestroy } from '@angular/core';
 
-export interface IFieldInfo {
-  fieldName: string;
-  formName: string;
-  onChange(newValue: any, e: Event): void;
-}
+export type IFieldChangeCallback = (newValue: any, e: Event) => void;
 
-export interface IFieldControl extends OnDestroy {
+export interface IFieldControl {
   onChange(e: Event): any;
   onValueUpdate(newValue: any): void;
-  initialise(fieldInfo: IFieldInfo): void;
+  initialise(onChange: IFieldChangeCallback): void;
 }

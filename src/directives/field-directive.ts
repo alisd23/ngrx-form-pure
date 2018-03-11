@@ -1,14 +1,15 @@
 import { Directive, Input, OnInit, OnDestroy, HostListener, Injector, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/pluck';
 
 import { FormDirective } from './form-directive';
 import { RadioFieldControl, CheckboxFieldControl, DefaultFieldControl } from './field-controls';
 import { IFieldControl, IStoreState, IFormState } from '../types';
-import { getFormActions, FormActions } from '../actions';
+import { getFormActions, IFormActions } from '../actions';
 import { delayAction } from '../utils/angular';
+
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/pluck';
 
 const typeToControl = {
   radio: RadioFieldControl,
@@ -16,6 +17,13 @@ const typeToControl = {
   default: DefaultFieldControl
 }
 
+/**
+ * [ngrxField] directive
+ * Handles the actions/logic relating to a single field, i.e. registering, unregistering,
+ * focus, blur. This directive should be applied to 'form elements' (input, select, etc.).
+ * The following actions need delaying until after change detection cycle:
+ * [initForm, registerForm, setInitialValues]
+ */
 @Directive({
   selector: `[ngrxField]`,
   providers: [RadioFieldControl, CheckboxFieldControl, DefaultFieldControl]
@@ -24,12 +32,14 @@ export class FieldDirective implements OnInit, OnDestroy {
   @Input('ngrxField') fieldName: string;
   @Input('name') name: string;
   @Input('type') type: string;
+  // element value => stateValueTransformer => state value
   @Input('stateValueTransformer') stateValueTransformer: (elementValue: any, e: Event) => any;
+  // state value => elementValueTransformer => element value
   @Input('elementValueTransformer') elementValueTransformer: (stateValue: any, element: HTMLInputElement) => any;
 
   private initialized = false;
   private fieldValue: any;
-  private formActions: FormActions<any, any>;
+  private formActions: IFormActions<any, any>;
   private fieldControl: IFieldControl;
   private subscriptions: Subscription[] = [];
 
@@ -78,17 +88,15 @@ export class FieldDirective implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    this.formActions = getFormActions(this.formName);
+    this.formActions = getFormActions()(this.formName);
 
     this.fieldControl = this.injector.get(
       typeToControl[this.type] || typeToControl.default
     );
 
-    this.fieldControl.initialise({
-      get formName() { return this.formName },
-      get fieldName() { return this.fieldName },
-      onChange: (value, e) => this.onChange(value, e)
-    });
+    this.fieldControl.initialise(
+      (value, e) => this.onChange(value, e)
+    );
 
     // Actions in the initialisation (onInit, afterViewInit, ...) phase must be delayed
     // until after this has completed. See README.md for information.
@@ -114,10 +122,6 @@ export class FieldDirective implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy() {
-    if (this.fieldControl) {
-      this.fieldControl.ngOnDestroy();
-    }
-
     this.subscriptions.forEach(sub => sub.unsubscribe());
 
     if (this.initialized) {

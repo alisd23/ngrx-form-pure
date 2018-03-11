@@ -18,7 +18,7 @@ export function setup(actions$: Subject<any>) {
       FieldDirective
     ],
     providers: [
-      { provide: Store, useFactory: () => new StoreMock() },
+      { provide: Store, useFactory: () => new StoreMock({}) },
       { provide: ActionsSubject, useFactory: () => actions$ }
     ]
   })

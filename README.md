@@ -19,7 +19,7 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [Simple Form](#simple-form)
   - [Form State](#form-state)
   - [Built-in Selectors](#built-in-selectors)
-  - [Typescript](#typescript)
+  - [TypeScript](#typescript)
 - [Guides](#guides)
   - [Radio Input Group](#radio-input-group)
   - [Checkbox Input Group](#checkbox-input-group)
@@ -32,7 +32,7 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
   - [ngrxField](#ngrxfield)
   - [Actions](#actions)
   - [Selectors](#selectors)
-  - [Validators](#validators)
+  - [Validators](#field-validators)
 - [Contributing & CI](#contributing--ci)
 
 ## Installation
@@ -221,41 +221,92 @@ interface UserFormShape {
 }
 ```
 
-> Note: Number inputs would still have a string value unless tranformed with the
-> [elementValueTransformer](#element-value-transformer) or [stateValueTransformer](#statevaluetransformer-value-any-e-event-any) property inputs.
+> **Note**  
+> Number inputs would still have a string value unless tranformed with the
+> [elementValueTransformer](#elementvaluetransformer-value-any-element-htmlinputelement--any) or [stateValueTransformer](#statevaluetransformer-value-any-e-event--any) property inputs.
 
-#### Root/App 'form state'
+#### App 'forms state'
 
 This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to use the `?` symbol for any form keys which are dynamically created/destroyed (i.e. do not always exist in your app), as the form state for these forms could be `undefined`.
 
 Some generic interfaces in `ngrx-form` will require this type to be passed as a generic parameter, mainly to restrict which string values can be passed in as *form name* parameters
 
 ```ts
-import { IFormState } from 'ngrx-form';
+import { IFormState, IFormReducerState } from 'ngrx-form';
 
-interface RootFormState {
+// Extending IFormReducerState is required to provide the strongest typings
+// when passing this interface as generic parameter to (getFormActions<AppFormsState>)
+interface AppFormsState extends IFormReducerState {
   newUser?: IFormState<UserFormShape>;
 }
 ```
 
-An example of this interface being used is when calling `getFormActions`
+An example of this interface being used is when calling [`getFormActions`](#getFormActions).
 
 ```ts
 import { getFormActions } from 'ngrx-form'
 
 // Will PASS type check
-const formActions = getFormActions<RootFormState>('newUser');
+const formActions = getFormActions<AppFormsState>()('newUser');
 // Will FAIL type check - 'nonExistentForm' is not a valid form name
-const formActions = getFormActions<RootFormState>('nonExistentForm');
+const formActions = getFormActions<AppFormsState>()('nonExistentForm');
 ```
+
+> See [the  API](#getFormActions) for the reason behind needing a curried function when calling `getFormActions()(formName)`.
+
+This type now gives us strong typings for all the functions on the `formActions` object. For example with the `changeField` action creator.
+
+```ts
+// Will PASS type check
+formActions.changeField('name', 'Jo');
+// Will FAIL type check, value parameter is the wrong type for name field.
+formActions.changeField('name', 1);
+``` 
 
 The root form state type can then be used when defining your top level 'App state' type:
 
 ```ts
 interface IAppState {
-  form: RootFormState
+  form: AppFormsState
 }
 ```
+
+#### Helper types
+
+`ngrx-form` also exposes some interfaces/types which can convert some complex types to others. These types usually take generic parameters, and converts these parameters in to other `shapes`.
+
+##### `IFormValues<TFormState>`
+Converts the state type of a form into a type representing the field names to the value type of those fields.
+This type will rarely be useful, as it produces the same type as your *form shape*. It is actually the **inverse** generic type to the `IFormState` generic type.
+
+```ts
+
+interface UserFormShape {
+  name: string;
+  age: string;
+}
+type UserFormState = IFormState<UserFormShape>;
+
+// UserFormValues will be the same type as UserFormShape
+type UserFormValues = IFormValues<UserFormShape>;
+```
+
+##### `IFieldErrors<TFormShape, TError = string>`
+Creates a type of field keys to error type (defaulting to string).
+This is the return type of the [getFieldErrors](#getfielderrors) selector.
+
+```ts
+type UserFormErrors = IFieldErrors<UserFormShape>;
+
+// Will have shape like:
+// type UserFormErrors = {
+//   name: string;
+//   age: string;
+// }
+```
+
+For other generic types, see [the source](https://github.com/alisd23/ngrx-form/tree/master/src/types)
+
 
 ## Guides
 
@@ -301,7 +352,7 @@ You'll notice both the `ngrxField` directive and `name` attribute have been set 
 
 ### Checkbox Input Group
 
-Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [elementValueTransformer](#elementvaluetransformer) and [stateValueTransformer](#statevaluetransformer-value-any-e-event-any) inputs for any `ngrxField` elements.
+Checkbox groups require a bit of custom code, but can be accomplished fairly concisely by utilising the [elementValueTransformer](#elementvaluetransformer-value-any-element-htmlinputelement--any) and [stateValueTransformer](#statevaluetransformer-value-any-e-event--any) inputs for any `ngrxField` elements.
 
 These transformer function inputs `elementValueTransformer` and `stateValueTransformer` intercept the new value about to be set for the fields *element value* and *state value* respectively, and transform them before being set:
 
@@ -418,7 +469,7 @@ function requiredValidator(value: string) {
 
 `Ngrx-form` will call these validators, passing in the current value of the field from state and the current state of the form the field belongs to. This should cover most cases for validators.
 
-To enable field field validation for some of you form fields pass down an object of field name keys to validators array to the [`fieldValidators`](#ngrxForm) input for the `ngrxForm` directive:
+To enable field field validation for some of you form fields pass down an object of field name keys to validators array to the [`fieldValidators`](#fieldvalidators--string-fieldname-ivalidator--optional) input for the `ngrxForm` directive:
 
 Here as example of a simple user form, where the `name` field is required, and will have it's state error field populated when the value is empty.
 
@@ -432,6 +483,7 @@ Here as example of a simple user form, where the `name` field is required, and w
 **user-form.component.ts**
 
 ```ts
+import { OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 interface IUserFormShape {
@@ -442,7 +494,7 @@ interface IUserFormShape {
   selector: 'user-form',
   templateUrl: './user-form.component.html'
 })
-class UserForm {
+class UserForm implements OnInit {
   constructor(
     private store: Store<any>
   ) {}
@@ -452,7 +504,7 @@ class UserForm {
   }
 
   // Subscribe to form state changes and log the current `name` field error.
-  ngOnInit() {
+  public ngOnInit() {
     this.store
       .select('form', 'userForm')
       .subscribe(formState => {
@@ -466,7 +518,7 @@ Check out the [demo](https://ngrx-form-demo.alisd.io) to see an example of valid
 
 ##### Provided validators
 
-Currently there is only one validator provided from `ngrx-form` (but happy to accept PR's with more!) - the required validator.
+Currently there is only one validator provided with `ngrx-form` (but happy to accept PR's with more!) - the **required validator**.
 
 See the [API](#provided-validators) for the current list of provided validators, and their signatures.
 
@@ -474,7 +526,7 @@ See the [API](#provided-validators) for the current list of provided validators,
 
 There is currently no built-in logic or form state to handle submit validation (errors, loading etc...), but this can be fairly easily implemented for the simple case.
 
-> However if there is interest this could be implemented.
+> However if there is interest this could be implemented as a built-in solution.
 
 Below is an example of a form component implementing a simple loading & validation flow, with just a single *submit error* to represent whether or not the request was successful.
 
@@ -531,29 +583,11 @@ class UserForm {
 
 Resetting a form requires a `RESET_FORM` action to be fired.
 
-See the [Actions API](#form-actions) for information on this.
+See the [Actions API](#actions) for information on this.
 
 ### Custom Form Controls
 
 It is possible to create custom form controls, which can follow the same lifecycle and state changes as built-form form fields.
-
-**Delaying Actions**
-
-It's important to note at this point that some *intialisation* actions must be **delayed** until **after** the inital change detection phase. This is due to the angular lifecycle and the fact that 'state changes' can not (or should not) occur in the middle of a change detection cycle.
-
-This delay can be done easily with the `delayAction` function exposed by this library, which is literally just a wrapper around `setTimeout(func, 0)`.
-
-```ts
-import { delayAction, getFormActions } from 'ngrx-form';
-
-const someFormActions = getFormActions<any>('someForm');
-
-delayAction(() => {
-  this.store.dispatch(someFormActions.registerField('someField'));
-});
-```
-
-See [this issue](https://github.com/angular/angular/issues/6005#issuecomment-165905348) for more on this.
 
 #### Simple example
 
@@ -561,8 +595,8 @@ The following example shows a simple name input component, which showcases how t
 
 For a real working example of a custom form control, see the [demo multiselect component](https://github.com/alisd23/ngrx-form/tree/master/demo/app/genre-multiselect).
 
-> **NOTE**
-> The `focus` and `blur` actions are not *required* have been included for the sake of the example.
+> **NOTE**  
+> The `focus` and `blur` actions are not *required*, but have been included for the sake of the example.
 
 **user-name-control.component.html**
 ```html
@@ -582,7 +616,7 @@ For a real working example of a custom form control, see the [demo multiselect c
 import { getFormActions } from 'ngrx-form';
 
 // 'newUser' is the name of the form this component belongs to.
-const userFormActions = getFormActions('newUser');
+const userFormActions = getFormActions()('newUser');
 
 @Component({
   selector: 'app-user-name-control',
@@ -632,9 +666,29 @@ export class UserNameComponent implements OnInit, OnDestroy {
 }
 ```
 
+**Delaying Actions**
+
+It's important to note at this point, as you can see in the example above, that some *intialisation* actions must be **delayed** until **after** the inital change detection phase. This is due to the angular lifecycle and the fact that 'state changes' can not (or should not) occur in the middle of a change detection cycle.
+
+This delay can be done easily with the `delayAction` function exposed by this library, which is literally just a wrapper around `setTimeout(func, 0)`.
+
+```ts
+import { delayAction, getFormActions } from 'ngrx-form';
+
+const someFormActions = getFormActions<any>()('someForm');
+
+delayAction(() => {
+  this.store.dispatch(someFormActions.registerField('someField'));
+});
+```
+
+See [this issue](https://github.com/angular/angular/issues/6005#issuecomment-165905348) for more on this.
+
+--- 
+
 The following list explains the actions which you can/need to dispatch when creating a custom form field control, when to dispatch them, and what their purpose is.
 
-Given `formActions` is the object returned by calling `getFormActions(:formName:)`.
+Given `formActions` is the object returned by calling `getFormActions()(formName)`.
 
 ##### `formActions.registerField(fieldName)`
  Creates the initial field object in `ngrx` state.
@@ -657,9 +711,7 @@ Sets the `focus` value of the field state to `true`.
 ##### `formActions.blurField(fieldName)`
 Sets the `focus` value of the field state to `false`.
 
-##### `formActions.resetField(fieldName)`
-Resets the state of the field (i.e. value, focus, etc...).
-
+> For more details on these actions see the [actions API](#actions)
 
 ## API
 
@@ -692,6 +744,8 @@ Emits a key-value object of field name to current value when the form element wi
 
 You can also still listen to the raw form `submit` event if you need to, but this output is a nicer way of getting the final form values on submit.
 
+---
+
 ### [ngrxField]
 
 The directive used to register and sync a form field element (`input`, `select`, etc.) to the form of the nearest `[ngrxForm]` parent. 
@@ -723,19 +777,111 @@ See [this section](#checkbox-input-group) for more information.
 
 It is named as such because it is *transforming* the new *state* value for the given field, before it is set.
 
----
 
-### Actions
-(List of actions - parameters, return types)
+### Dispatching Actions
+
+##### `getFormActions<AppFormsState>()(formName: string): IFormActions`
+A curried function which returns an object of **action creators** which return `action` objects. The actions available on this object are listed below.
+
+Actions can then be dispatched like so:
+
+```ts
+const formActions = getFormActions()('userForm');
+store.dispatch(formActions.initForm());
+```
+
+The `AppFormsState` generic parameter is the type of the state tree under the top level `form` key, managed by `ngrx-form`. See the [TypeScript section](#typescript) for more on this.
+
+
+> **NOTE**  
+> The reason for having a curried function here is because TypeScript does not yet support a subset of generic parameters to be optional. It's all or nothing. To provide the strongest typings possible a workaround is necessary.
+> See this issue for more details: https://github.com/Microsoft/TypeScript/issues/16597
+
+
+### Action Creators
+
+The following is an exhaustive list of all the `ngrx-form` action creators of which the return value can be dispatched. Usually this will only need to be done in [custom components](#custom-components), and some of these actions you should *never™* need to dispatch,
+ but they are documented just in case.
+
+
+The following action creators assume the `getFormActions` function above has been called and the resulting object is stored in some `formActions` variable.
+
+##### `formActions.initForm()`
+When dispatched, a new form will be created in the root forms state, initialised with empty values. The new form state will be under the key name specified in the initial `getFormActions` call.
+
+##### `formActions.resetForm()`
+When dispatched, the form will reset back to the default state, resetting any field values back to their initial values, if they were set at some point via the `setInitialValues` action. 
+
+##### `formActions.destroyForm()`
+When dispatched, the form state will be destroyed, and the form state object completely removed from the root form state object. 
+
+##### `formActions.focusField(fieldName: string)`
+When dispatched, the field defined by the `fieldName` parameter will have its `focus` state set to `true`.
+
+##### `formActions.blurField(fieldName: string)`
+When dispatched, the field defined by the `fieldName` parameter will have its `focus` state set to `false`.
+
+Also the field's `touched` property is set to `false` as the field has now been focused and unfocused at least once.
+
+##### `formActions.changeField(fieldName: string, value: any)`
+When dispatched, the field defined by the `fieldName` parameter will have its `value` state updated to that provided by the `value` parameter.
+
+> **Note**  
+> Although the parameters are weakly typed here, if you are using typescript as described in the [TypeScript](#typescript) section, there are stronger guarentees.
+The field must be one of the keys in the form shape.
+The value must be the correct value of that field as defined in the form shape type.
+
+##### `formActions.updateFieldErrors(errors: { [fieldName: string]: any})`
+Sets the errors for **all** the fields in the form. The `errors` parameter is an object of field names to error messages/values. If a field is not present in the object, it's error will be set to `undefined`, effectively *unsetting* the error.
+
+##### `formActions.registerField(fieldName: string)`
+Registers a field in the form. If this is the first time a field with this name has been registered, a new object is set in the form controls state, under the `fieldName` key. If it is not the first field of this name being registered, only the `count` of that field is updated in state.
+
+This action creator will be useful when creating [custom form controls](#custom-form-controls).
+
+##### `formActions.unregisterField(fieldName: string)`
+Unregisters a field in the form. If there is only one field registered with that name, the field's state will be removed from the form controls state entirely. If there are still registered fields left with the same name, the `count` state property is decremented by 1.
+
+This action creator will be useful when creating [custom form controls](#custom-form-controls).
+
+##### `formActions.setInitialValues(values: { [fieldName: string]: any })`
+Sets any initial values for the fields in the form. These are the values which will be set in the field's state when the form if the form resets (and also after this action is dispatched).
+
+The *type* of the `values` parameter is more strongly typed as the *form shape*. (See the [TypeScript](#typescript) section).
+
 
 ---
 
 ### Selectors
-(getFormValues)
-(getFormErrors)
-(isFormPristine)
+Selectors are simply functions which convert part of the form state into a different format. Some common selectors are provided by `ngrx-form`.
 
-### Validators
+The current set of built-in selectors are as follows.
+
+##### `getFormValues(formState: IFormState<any>): IFormValues<any>`
+Returns an object of field name keys to field values.
+
+##### `getFormErrors(formState: IFormState<any>): IFormErrors<any>`
+Returns an object of field name keys to field errors.
+
+##### `isFormPristine(formState: IFormState<any>): boolean`
+Returns a boolean flag signalling whether or not the form is **pristine**.
+
+A form is pristine if all the field values are the same as their *initial values*, if there are any `initialValues` defined.
+
+If there are no `initialValues` defined in state, this selector returns `false`.
+
+> **Note**
+> For these selectors, if using typings as described in the [TypeScript](#typescript) section, the `any` generics in the method signatures above will instead be strongly typed to the *shape* of the form.
+
+---
+
+### Field Validators
+The following set is the set of built-in field validators provided by `ngrx-form`.
+
+See the [field validation](#field-validation) section for an example of using field validation.
+
+##### `required(fieldName: string): IFieldValidator<any, any>`
+The validator returned by the `required` function resolves to an error in the format: `"${fieldName} is required"` when the value of the field is *falsy*.
 
 
 ## Contributing & CI

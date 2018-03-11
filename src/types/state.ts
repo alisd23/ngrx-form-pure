@@ -2,8 +2,8 @@
  * Interface for the field errors of a form, which is a mapping of form shape
  * to string error
  */
-export type IFieldErrors<FormShape, ErrorType = string> = {
-  [Field in keyof FormShape]?: ErrorType;
+export type IFieldErrors<TFormShape, TError = string> = {
+  [Field in keyof TFormShape]?: TError;
 };
 
 /**
@@ -17,8 +17,8 @@ export interface IFormReducerState {
 /**
  * Converts a form state type to a mapping of form fields to value types
  */
-export type IFormValues<FormState extends IFormState<any, any>> = {
-  [Field in keyof FormState['fields']]: FormState['fields'][Field]['value'];
+export type IFormValues<TFormState extends IFormState<any, any>> = {
+  [Field in keyof TFormState['fields']]: TFormState['fields'][Field]['value'];
 }
 
 /**
@@ -30,10 +30,10 @@ export type IFormValues<FormState extends IFormState<any, any>> = {
  *   name: string;
  * }
  */
-export interface IFormState<FormShape, ErrorType = string> {
+export interface IFormState<TFormShape, TError = string> {
   name: string;
-  initialValues?: Partial<FormShape>;
-  fields: IFormFields<FormShape, ErrorType>;
+  initialValues?: Partial<TFormShape>;
+  fields: IFormFields<TFormShape, TError>;
   invalid: boolean;
 }
 
@@ -42,18 +42,18 @@ export interface IFormState<FormShape, ErrorType = string> {
  * a mapping type of field names to IFormFieldState objects.
  * This is the interface used for the "controls" property of the IFormState interface.
  */
-export type IFormFields<FormShape, ErrorType = string> = {
-  [FieldName in keyof FormShape]?: IFormFieldState<FormShape[FieldName], ErrorType>;
+export type IFormFields<TFormShape, TError = string> = {
+  [FieldName in keyof TFormShape]?: IFormFieldState<TFormShape[FieldName], TError>;
 };
 
 /**
  * The interface for a single field in the form state
  * "V" is the field value type (e.g. string, number)
  */
-export interface IFormFieldState<ValueType, ErrorType = string> {
-  error?: ErrorType;
+export interface IFormFieldState<TValue, TError = string> {
+  error?: TError;
   focus: boolean;
-  value: ValueType;
+  value: TValue;
   count: number;
   touched: boolean;
 }

@@ -5,7 +5,10 @@ import { getFormActions, delayAction } from 'ngrx-form';
 import { AppFormState, AppState } from '../types';
 import { Genre } from '../enums';
 
-const userFormActions = getFormActions<AppFormState>('newUser');
+// NOTE: Currently need to use currying here because TypeScript does not yet support
+// a subset of generic parameters to be optional. It's all or nothing.
+// See this issues for info: https://github.com/Microsoft/TypeScript/issues/16597
+const userFormActions = getFormActions<AppFormState>()('newUser');
 
 @Component({
   selector: 'app-genre-multiselect',

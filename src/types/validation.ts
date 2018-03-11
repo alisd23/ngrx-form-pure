@@ -1,8 +1,8 @@
 import { IFormState } from './state';
 
-export type IFieldValidator<FormShape, V> =
-  (value: V, form: IFormState<FormShape>) => string | undefined
+export type IFieldValidator<TFormShape, TValue> =
+  (value: TValue, form: IFormState<TFormShape>) => string | undefined
 
-export type IFieldValidators<FormShape> = {
-  [Field in keyof FormShape]?: IFieldValidator<FormShape, FormShape[Field]>[];
+export type IFieldValidators<TFormShape> = {
+  [Field in keyof TFormShape]?: IFieldValidator<TFormShape, TFormShape[Field]>[];
 }

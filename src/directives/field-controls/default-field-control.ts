@@ -1,10 +1,17 @@
 import {  ElementRef, Injectable, OnDestroy } from '@angular/core';
-import { IFieldControl, IFieldInfo } from '../../types';
+import { IFieldControl, IFieldChangeCallback } from '../../types';
 
+/**
+ * Field control for a regular input, or any input not handled by one of the specific
+ * field controls (e.g. checkbox, radio).
+ * Its job is to handle what the next 'state' value for the field should be, by calling
+ * the onChange(newValue) callback passed in via 'initialise' method, which is called by the
+ * FIeldDirective itself.
+ */
 @Injectable()
 export class DefaultFieldControl implements IFieldControl, OnDestroy {
   private element: HTMLInputElement;
-  private fieldInfo: IFieldInfo;
+  private fieldOnChange: IFieldChangeCallback;
 
   constructor(
     private elementRef: ElementRef,
@@ -12,15 +19,17 @@ export class DefaultFieldControl implements IFieldControl, OnDestroy {
 
   // Arrow function to bind context correctly
   public onChange = (e: Event) => {
-    this.fieldInfo.onChange(this.element.value, e);
+    this.fieldOnChange(this.element.value, e);
   }
 
+  // Called from FieldDirective when the fields' state value changes
   public onValueUpdate(newValue: string) {
     this.element.value = newValue || '';
   }
 
-  public initialise(fieldInfo: IFieldInfo) {
-    this.fieldInfo = fieldInfo;
+  // Called from FieldDirective when the field intialises (after ngOnInit)
+  public initialise(fieldChangeCallback: IFieldChangeCallback) {
+    this.fieldOnChange = fieldChangeCallback;
     this.element = this.elementRef.nativeElement;
     this.element.addEventListener('input', this.onChange);
   }

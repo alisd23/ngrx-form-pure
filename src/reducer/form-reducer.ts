@@ -1,7 +1,7 @@
 import { IFormReducerState, IFormState } from '../types';
 import {
   Actions, ActionConstants, getFormActions, SetInitialValuesAction, InitFormAction, UpdateFieldErrorsAction,
-  UnregisterFieldAction, ResetFormAction
+  UnregisterFieldAction, ResetFormAction, ResetFieldAction
 } from '../actions';
 import { fieldReducer } from './field-reducer';
 
@@ -32,16 +32,24 @@ function resetFormReducer(
   state: IFormState<any>,
   action: ResetFormAction<IFormReducerState>
 ) {
-  const formActions = getFormActions<any>(action.payload.formName);
+  const formActions = getFormActions<any>()(action.payload.formName);
   const initialValues = state.initialValues || {};
   const fieldNames = Object.keys(state.fields);
   const fieldsState = { ...state.fields };
 
   for (const name of fieldNames) {
+    const resetFieldAction: ResetFieldAction<any, any> = {
+      type: ActionConstants.RESET_FIELD,
+      payload: {
+        fieldName: name,
+        formName: action.payload.formName,
+        value: initialValues[name]
+      }
+    }
     // Reset each field and set initialValue (if there is one)
     fieldsState[name] = fieldReducer(
       state.fields[name],
-      formActions.resetField(name, initialValues[name])
+      resetFieldAction
     );
   }
 
@@ -62,7 +70,7 @@ function setInitialValuesReducer(
   state: IFormState<any>,
   action: SetInitialValuesAction<IFormReducerState, any>
 ) {
-  const formActions = getFormActions<any>(action.payload.formName);
+  const formActions = getFormActions<any>()(action.payload.formName);
   const { values } = action.payload;
   const fieldNames = Object.keys(values);
   const fieldsState = { ...state.fields };

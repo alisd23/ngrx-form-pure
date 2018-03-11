@@ -64,12 +64,12 @@ describe('Form directive [ngrxForm]', () => {
     setupTest();
     detectFormLifecycleActions(fixture);
 
-    store.subject$.next(createRootState({
+    store.next(createRootState({
       fields: {
         name: { value: 'John' },
         age: { value: '40' },
       }
-    }));
+    }) as any);
 
     const submitSpy = jasmine.createSpy('onSubmit');
     formDirective.submit.subscribe(submitSpy);
