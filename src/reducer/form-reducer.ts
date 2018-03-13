@@ -32,7 +32,6 @@ function resetFormReducer(
   state: IFormState<any>,
   action: ResetFormAction<IFormReducerState>
 ) {
-  const formActions = getFormActions<any>()(action.payload.formName);
   const initialValues = state.initialValues || {};
   const fieldNames = Object.keys(state.fields);
   const fieldsState = { ...state.fields };

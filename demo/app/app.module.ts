@@ -6,7 +6,6 @@ import { StoreModule, ActionReducer } from '@ngrx/store';
 import * as hljs from 'highlight.js';
 import { HighlightJsModule, HIGHLIGHT_JS } from 'angular-highlight-js';
 
-import { AppState } from './types';
 import { AppComponent } from './app.component';
 import { UserFormComponent } from './user-form/user-form.component';
 import { GenreMultiselectComponent } from './genre-multiselect/genre-multiselect.component';
