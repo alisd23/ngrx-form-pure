@@ -30,7 +30,8 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
 - [API](#api)
   - [ngrxForm](#ngrxform)
   - [ngrxField](#ngrxfield)
-  - [Actions](#actions)
+  - [Dispatching Actions](#dispatching-actions)
+  - [Action Creators](#action-creators)
   - [Selectors](#selectors)
   - [Validators](#field-validators)
 - [Contributing & CI](#contributing--ci)
@@ -201,7 +202,7 @@ const userFormValues$: Observable<IUserFormShape> = store
   .map(getFormValues);
 ```
 
-###### See the [selectors API](#state-selectors) for a list of all the available built-in selectors.
+###### See the [selectors API](#selectors) for a list of all the available built-in selectors.
 
 
 ### TypeScript
@@ -227,7 +228,7 @@ interface UserFormShape {
 
 #### App 'forms state'
 
-This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to use the `?` symbol for any form keys which are dynamically created/destroyed (i.e. do not always exist in your app), as the form state for these forms could be `undefined`.
+This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to make any forms which are dynamically created/destroyed optional with the `?` symbol as the form state for these forms could be `undefined` at some points in time.
 
 Some generic interfaces in `ngrx-form` will require this type to be passed as a generic parameter, mainly to restrict which string values can be passed in as *form name* parameters
 
@@ -241,7 +242,7 @@ interface AppFormsState extends IFormReducerState {
 }
 ```
 
-An example of this interface being used is when calling [`getFormActions`](#getFormActions).
+An example of this interface being used is when calling [`getFormActions`](#getformactionsappformsstateformname-string-iformactions).
 
 ```ts
 import { getFormActions } from 'ngrx-form'
@@ -252,7 +253,7 @@ const formActions = getFormActions<AppFormsState>()('newUser');
 const formActions = getFormActions<AppFormsState>()('nonExistentForm');
 ```
 
-> See [the  API](#getFormActions) for the reason behind needing a curried function when calling `getFormActions()(formName)`.
+> See [the  API](#getformactionsappformsstateformname-string-iformactions) for the reason behind needing a curried function when calling `getFormActions()(formName)`.
 
 This type now gives us strong typings for all the functions on the `formActions` object. For example with the `changeField` action creator.
 
@@ -293,7 +294,7 @@ type UserFormValues = IFormValues<UserFormShape>;
 
 ##### `IFieldErrors<TFormShape, TError = string>`
 Creates a type of field keys to error type (defaulting to string).
-This is the return type of the [getFieldErrors](#getfielderrors) selector.
+This is the return type of the [getFieldErrors](#getfielderrorsformstate-iformstateany-iformerrorsany) selector.
 
 ```ts
 type UserFormErrors = IFieldErrors<UserFormShape>;
@@ -305,7 +306,7 @@ type UserFormErrors = IFieldErrors<UserFormShape>;
 // }
 ```
 
-For other generic types, see [the source](https://github.com/alisd23/ngrx-form/tree/master/src/types)
+For other generic types, see [the types source](https://github.com/alisd23/ngrx-form/tree/master/src/types).
 
 
 ## Guides
@@ -314,7 +315,7 @@ The following guides have been created with the goal to keep them as simple and 
 
 This is purely because the typings for the form state can be quite complex so for the purpose of keeping the example code small I have ommitted many typings.
 
-A full guide to achieving strong typing with this library can be found in the [TypeScript]('typescript') section.
+A full guide to achieving strong typing with this library can be found in the [TypeScript](#typescript) section.
 
 Or check out the [demo code](https://github.com/alisd23/ngrx-form/tree/master/demo) to see an example of strong typings with `ngrx-form`.
 
@@ -439,11 +440,11 @@ class CheckboxGroupForm {
 }
 ```
 
-For a full description on how to use these transform functions for each input type, see the [API](#value-transformer).
+For a full description on how to use these transform functions for each input type, see the [API](##elementvaluetransformer-value-any-element-htmlinputelement--any).
 
 ---
 
-See the demo for full examples of both radio button groups and checkbox groups [on GitHub](https://github.com/alisd23/ngrx-form/tree/master/demo/app/user-form).
+See the demo for full examples of both radio button groups and checkbox groups [in the demo](https://github.com/alisd23/ngrx-form/tree/master/demo/app/user-form).
 > See the demo running [here](https://ngrx-form-demo.alisd.io)
 
 ### Field validation
@@ -583,7 +584,7 @@ class UserForm {
 
 Resetting a form requires a `RESET_FORM` action to be fired.
 
-See the [Actions API](#actions) for information on this.
+See the [Actions API](#dispatching-actions) for information on this.
 
 ### Custom Form Controls
 
@@ -682,7 +683,7 @@ delayAction(() => {
 });
 ```
 
-See [this issue](https://github.com/angular/angular/issues/6005#issuecomment-165905348) for more on this.
+See [this issue](https://github.com/angular/angular/issues/6005#issuecomment-165905348) for more details on this.
 
 --- 
 
@@ -711,7 +712,7 @@ Sets the `focus` value of the field state to `true`.
 ##### `formActions.blurField(fieldName)`
 Sets the `focus` value of the field state to `false`.
 
-> For more details on these actions see the [actions API](#actions)
+> For more details on these actions see the [actions API](#dispatching-actions)
 
 ## API
 
@@ -765,7 +766,7 @@ Just the raw element `type` attribute. This is still applied as a regular `type`
 A **state value transformer** function is called when the field's **DOM** value changes. Value returned from this function is what the field's **state** value will be set to.
 
 The value passed in to this function depends on the `type` of the field element.
-See [this section](#checkbox-input-group) for more information.
+See the [checkbox group guide](#checkbox-input-group) for more information.
 
 It is named as such because it is *transforming* the new *state* value for the given field, before it is set.
 
@@ -773,7 +774,7 @@ It is named as such because it is *transforming* the new *state* value for the g
 An **element value transformer** function is called when the field's **state** value changes. The value returned from this function is what the field's **DOM** value will be set to.
 
 The return value required depends on the `type` of the field element.
-See [this section](#checkbox-input-group) for more information.
+See the [checkbox group guide](#checkbox-input-group) for more information.
 
 It is named as such because it is *transforming* the new *state* value for the given field, before it is set.
 
@@ -790,12 +791,12 @@ const formActions = getFormActions()('userForm');
 store.dispatch(formActions.initForm());
 ```
 
-The `AppFormsState` generic parameter is the type of the state tree under the top level `form` key, managed by `ngrx-form`. See the [TypeScript section](#typescript) for more on this.
+The `AppFormsState` generic parameter is the type of the state tree under the top level `form` key, managed by `ngrx-form`. See the [TypeScript section](#typescript) for more details on this.
 
 
 > **NOTE**  
 > The reason for having a curried function here is because TypeScript does not yet support a subset of generic parameters to be optional. It's all or nothing. To provide the strongest typings possible a workaround is necessary.
-> See this issue for more details: https://github.com/Microsoft/TypeScript/issues/16597
+> See this issue for more details: https://github.com/Microsoft/TypeScript/issues/16597.
 
 
 ### Action Creators
@@ -860,7 +861,7 @@ The current set of built-in selectors are as follows.
 ##### `getFormValues(formState: IFormState<any>): IFormValues<any>`
 Returns an object of field name keys to field values.
 
-##### `getFormErrors(formState: IFormState<any>): IFormErrors<any>`
+##### `getFieldErrors(formState: IFormState<any>): IFormErrors<any>`
 Returns an object of field name keys to field errors.
 
 ##### `isFormPristine(formState: IFormState<any>): boolean`
@@ -887,6 +888,6 @@ The validator returned by the `required` function resolves to an error in the fo
 ## Contributing & CI
 
 `ngrx-form` uses the following services/technologies for the CI and testing:
-- [Travis CI](https://travis-ci.org/) for the CI, which runs unit and integration tests.
+- [Travis CI](travis-ci.org/alisd23/ngrx-form) for the CI, which runs unit and integration tests.
 - [Cypress](https://www.cypress.io/) for the integration tests (which run on Travis). Past integration test runs (including recordings of the tests) can be seen on the [Cypress ngrx-form dashboard](https://dashboard.cypress.io/#/projects/rep3hw/runs).
 - Karma & Jasmine for unit tests.
