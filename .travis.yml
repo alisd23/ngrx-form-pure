@@ -19,4 +19,5 @@ script:
   - yarn run lint
   - yarn run test --singleRun --browsers Chrome,Firefox
   - yarn run integration:ci
-  - npm run semantic-release
+  - yarn run build:lib 
+  - yarn run semantic-release
