@@ -1,11 +1,15 @@
-# ngrx-form
+# ngrx-form-pure
 
-Ngrx-form is a library for storing your form state in the global state container provided by `@ngrx/store`.
+Ngrx-form-pure is a library for storing your form state in the global state container provided by `@ngrx/store`.
+
+This library does **not** rely on `@angular/forms` and instead handles all form state independently.
+This means this library has full control of the form functionality, and provides a blank canvas
+with regards to adding extra features in the future.
 
 This library has currently only been tested with `@ngrx/store` version **5.x** but may work with others.
 
 > #### Disclaimer
-> Even if you are using `ngrx-form` in your app, it doesn't necessarily mean you *need*
+> Even if you are using `ngrx-form-pure` in your app, it doesn't necessarily mean you *need*
 > this library. Only use this library if you definitely want your form state to be globally
 > available in the `ngrx/store` global state container, and/or require the benefits of
 > `ngrx/store` for forms.
@@ -40,15 +44,15 @@ This library has currently only been tested with `@ngrx/store` version **5.x** b
 
 #### npm
 ```
-npm install ngrx-form --save
+npm install ngrx-form-pure --save
 ```
 
 #### yarn
 ```
-yarn add ngrx-form
+yarn add ngrx-form-pure
 ```  
 #### Peer Dependencies
- Ngrx-form has the following peer dependencies which you must install in order
+ ngrx-form-pure has the following peer dependencies which you must install in order
  to use this library:
 - `@angular/core - v5.x`
 - `@ngrx/store - v5.x`
@@ -57,13 +61,13 @@ yarn add ngrx-form
 
 ### Getting Started
 
-Firstly, we need to register the `ngrx-form` module, which will automatically register
-the `ngrx-form` reducer under the `form` key at the top level of your `ngrx` state.
+Firstly, we need to register the `ngrx-form-pure` module, which will automatically register
+the `ngrx-form-pure` reducer under the `form` key at the top level of your `ngrx` state.
 
 ```ts
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { NgrxFormModule } from 'ngrx-form';
+import { NgrxFormModule } from 'ngrx-form-pure';
 import { StoreModule } from '@ngrx/store';
 
 import { AppComponent } from './app.component';
@@ -85,9 +89,9 @@ export class AppModule {}
 
 ### Simple Form
 
-`ngrx-form` uses directives to manage the communication and state changes required to sync the form state with the form fields.
+`ngrx-form-pure` uses directives to manage the communication and state changes required to sync the form state with the form fields.
 
-There are only **two** directives in `ngrx-form`:
+There are only **two** directives in `ngrx-form-pure`:
 - `ngrxForm` - to attach to your form element.
 - `ngrxField` - to attach to your form fields/inputs.
 
@@ -103,7 +107,7 @@ The following is a very simple example of a form with just two text inputs.
 </form>
 ```
 
-The `ngrx-form` directives in the template above will automatically create the form and both fields fields in the `@ngrx/store` state, and any changes to the fields state (e.g. value, focus) will be kept in sync with that state. See the next section for a more detailed look at the shape of the state for a form.
+The `ngrx-form-pure` directives in the template above will automatically create the form and both fields fields in the `@ngrx/store` state, and any changes to the fields state (e.g. value, focus) will be kept in sync with that state. See the next section for a more detailed look at the shape of the state for a form.
 
 The `(ngrxSubmit)` output emits an object of field names to values when the form is submitted.
 
@@ -132,7 +136,7 @@ class UserForm {
 
 ### Form State
 
-The state of any forms hooked up to `ngrx-form` will be stored in your global state tree in the following way:
+The state of any forms hooked up to `ngrx-form-pure` will be stored in your global state tree in the following way:
 
 ```ts
 // Example form shape:
@@ -173,7 +177,7 @@ interface IUserFormState {
 }
 ```
 
-For a clear example of what the state shape for a form looks like in reality - check out the [demo](https://ngrx-form-demo.alisd.io).
+For a clear example of what the state shape for a form looks like in reality - check out the [demo](https://ngrx-form-pure-demo.alisd.io).
 
 Interfaces for state types are provided by this library to give you strong typing (or the option for strong typing) in your state tree and form actions, and to make defining types like the `IUserFormState` interface much simpler.
 
@@ -184,12 +188,12 @@ Interfaces for state types are provided by this library to give you strong typin
 
 State **selectors** are functions which transform the raw state into a different, more useful format. These functions can be used in conjunction with the RxJS `map` operator on the state stream returned by `Store.select()`, or just called directly with some state object.
 
-`ngrx-form` comes with a few built-in selectors as a starting point which can be used to transform form state into different formats.
+`ngrx-form-pure` comes with a few built-in selectors as a starting point which can be used to transform form state into different formats.
 
 For example, grabbing the current field values out of the form state using the built-in `getFormValues` selector:
 
 ```ts
-import { getFormValues } from 'ngrx-form';
+import { getFormValues } from 'ngrx-form-pure';
 
 interface IUserFormShape {
   name: string;
@@ -228,12 +232,12 @@ interface UserFormShape {
 
 #### App 'forms state'
 
-This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to make any forms which are dynamically created/destroyed optional with the `?` symbol as the form state for these forms could be `undefined` at some points in time.
+This is the interface for the state object under the top level `form` key - the state tree managed by `ngrx-form-pure`. You should list all the forms you have in your app here, with the associated form state type. It's probably a good idea to make any forms which are dynamically created/destroyed optional with the `?` symbol as the form state for these forms could be `undefined` at some points in time.
 
-Some generic interfaces in `ngrx-form` will require this type to be passed as a generic parameter, mainly to restrict which string values can be passed in as *form name* parameters
+Some generic interfaces in `ngrx-form-pure` will require this type to be passed as a generic parameter, mainly to restrict which string values can be passed in as *form name* parameters
 
 ```ts
-import { IFormState, IFormReducerState } from 'ngrx-form';
+import { IFormState, IFormReducerState } from 'ngrx-form-pure';
 
 // Extending IFormReducerState is required to provide the strongest typings
 // when passing this interface as generic parameter to (getFormActions<AppFormsState>)
@@ -245,7 +249,7 @@ interface AppFormsState extends IFormReducerState {
 An example of this interface being used is when calling [`getFormActions`](#getformactionsappformsstateformname-string-iformactions).
 
 ```ts
-import { getFormActions } from 'ngrx-form'
+import { getFormActions } from 'ngrx-form-pure'
 
 // Will PASS type check
 const formActions = getFormActions<AppFormsState>()('newUser');
@@ -274,7 +278,7 @@ interface IAppState {
 
 #### Helper types
 
-`ngrx-form` also exposes some interfaces/types which can convert some complex types to others. These types usually take generic parameters, and converts these parameters in to other `shapes`.
+`ngrx-form-pure` also exposes some interfaces/types which can convert some complex types to others. These types usually take generic parameters, and converts these parameters in to other `shapes`.
 
 ##### `IFormValues<TFormState>`
 Converts the state type of a form into a type representing the field names to the value type of those fields.
@@ -306,7 +310,7 @@ type UserFormErrors = IFieldErrors<UserFormShape>;
 // }
 ```
 
-For other generic types, see [the types source](https://github.com/alisd23/ngrx-form/tree/master/src/types).
+For other generic types, see [the types source](https://github.com/alisd23/ngrx-form-pure/tree/master/src/types).
 
 
 ## Guides
@@ -317,11 +321,11 @@ This is purely because the typings for the form state can be quite complex so fo
 
 A full guide to achieving strong typing with this library can be found in the [TypeScript](#typescript) section.
 
-Or check out the [demo code](https://github.com/alisd23/ngrx-form/tree/master/demo) to see an example of strong typings with `ngrx-form`.
+Or check out the [demo code](https://github.com/alisd23/ngrx-form-pure/tree/master/demo) to see an example of strong typings with `ngrx-form-pure`.
 
 ### Radio Input Group
 
-Radio input groups work out of the box with `ngrx-form`. Radio inputs with the same `ngrxField` name (and `name`) will be treated as part of the same *group*, therefore creating only one key in the form `fields` state, which all the inputs of the group share.
+Radio input groups work out of the box with `ngrx-form-pure`. Radio inputs with the same `ngrxField` name (and `name`) will be treated as part of the same *group*, therefore creating only one key in the form `fields` state, which all the inputs of the group share.
 
 The value of the radio group field in state will be the `value` of the currently selected radio input.
 
@@ -366,9 +370,9 @@ These transformer function inputs `elementValueTransformer` and `stateValueTrans
 
 ```
 
-The type of the *input value* returned from the `elementValueTransformer` passed into the `stateValueTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form`.
+The type of the *input value* returned from the `elementValueTransformer` passed into the `stateValueTransformer` as a parameter depend on the **type** of the input, and correspond to the default type stored in state by `ngrx-form-pure`.
 - For **regular inputs, selects, and radio buttons**, they will be the inputs value, because these form fields normally correspond to a single `string` value.
-- For **checkboxes**, the type is a `boolean` - the checked status, which is what `ngrx-form` will store by default in state.
+- For **checkboxes**, the type is a `boolean` - the checked status, which is what `ngrx-form-pure` will store by default in state.
 
 **checkbox-group-form.component.html**
 ```html
@@ -411,7 +415,7 @@ class CheckboxGroupForm {
       .subscribe(formState => this.formState = formState);
   }
 
-  // Return whether or not the checkbox should be checked. Ngrx-form will then set
+  // Return whether or not the checkbox should be checked. ngrx-form-pure will then set
   // the inputs checked value appropriately.
   public fruitElementValueTransform = (fruits: string[], element: HTMLInputElement) => {
     return (
@@ -444,12 +448,12 @@ For a full description on how to use these transform functions for each input ty
 
 ---
 
-See the demo for full examples of both radio button groups and checkbox groups [in the demo](https://github.com/alisd23/ngrx-form/tree/master/demo/app/user-form).
-> See the demo running [here](https://ngrx-form-demo.alisd.io)
+See the demo for full examples of both radio button groups and checkbox groups [in the demo](https://github.com/alisd23/ngrx-form-pure/tree/master/demo/app/user-form).
+> See the demo running [here](https://ngrx-form-pure-demo.alisd.io)
 
 ### Field validation
 
-`Ngrx-form` provides a simple API for field-level validation. You are able to associate each field with an array of **validators**, which `ngrx-form` will call in the order that they appear in the array, until the first *truthy* value is returned form a validator. This value will then be set in the `error` property in the state for that field.
+`ngrx-form-pure` provides a simple API for field-level validation. You are able to associate each field with an array of **validators**, which `ngrx-form-pure` will call in the order that they appear in the array, until the first *truthy* value is returned form a validator. This value will then be set in the `error` property in the state for that field.
 
 A validator has the following shape:
 
@@ -468,7 +472,7 @@ function requiredValidator(value: string) {
 }
 ```
 
-`Ngrx-form` will call these validators, passing in the current value of the field from state and the current state of the form the field belongs to. This should cover most cases for validators.
+`ngrx-form-pure` will call these validators, passing in the current value of the field from state and the current state of the form the field belongs to. This should cover most cases for validators.
 
 To enable field field validation for some of you form fields pass down an object of field name keys to validators array to the [`fieldValidators`](#fieldvalidators--string-fieldname-ivalidator--optional) input for the `ngrxForm` directive:
 
@@ -515,11 +519,11 @@ class UserForm implements OnInit {
 }
 ```
 
-Check out the [demo](https://ngrx-form-demo.alisd.io) to see an example of validators in action.
+Check out the [demo](https://ngrx-form-pure-demo.alisd.io) to see an example of validators in action.
 
 ##### Provided validators
 
-Currently there is only one validator provided with `ngrx-form` (but happy to accept PR's with more!) - the **required validator**.
+Currently there is only one validator provided with `ngrx-form-pure` (but happy to accept PR's with more!) - the **required validator**.
 
 See the [API](#provided-validators) for the current list of provided validators, and their signatures.
 
@@ -594,7 +598,7 @@ It is possible to create custom form controls, which can follow the same lifecyc
 
 The following example shows a simple name input component, which showcases how to initialise a custom form control correctly.
 
-For a real working example of a custom form control, see the [demo multiselect component](https://github.com/alisd23/ngrx-form/tree/master/demo/app/genre-multiselect).
+For a real working example of a custom form control, see the [demo multiselect component](https://github.com/alisd23/ngrx-form-pure/tree/master/demo/app/genre-multiselect).
 
 > **NOTE**  
 > The `focus` and `blur` actions are not *required*, but have been included for the sake of the example.
@@ -614,7 +618,7 @@ For a real working example of a custom form control, see the [demo multiselect c
 
 **user-name-control.component.ts**
 ```ts
-import { getFormActions } from 'ngrx-form';
+import { getFormActions } from 'ngrx-form-pure';
 
 // 'newUser' is the name of the form this component belongs to.
 const userFormActions = getFormActions()('newUser');
@@ -674,7 +678,7 @@ It's important to note at this point, as you can see in the example above, that 
 This delay can be done easily with the `delayAction` function exposed by this library, which is literally just a wrapper around `setTimeout(func, 0)`.
 
 ```ts
-import { delayAction, getFormActions } from 'ngrx-form';
+import { delayAction, getFormActions } from 'ngrx-form-pure';
 
 const someFormActions = getFormActions<any>()('someForm');
 
@@ -757,10 +761,10 @@ The directive used to register and sync a form field element (`input`, `select`,
 The value for the `[ngrxField]` directive itself. Defines the name of the key used under the form state, in which the field state will be stored.
 
 ##### `[name]`: *`string`*
-Just the raw element `name` attribute. This is still applied as a regular `name` attribute to the element, but is also needed by `ngrx-form` internally.
+Just the raw element `name` attribute. This is still applied as a regular `name` attribute to the element, but is also needed by `ngrx-form-pure` internally.
 
 ##### `[type]`: *`string`*
-Just the raw element `type` attribute. This is still applied as a regular `type` attribute on the element, but is also needed by `ngrx-form` internally.
+Just the raw element `type` attribute. This is still applied as a regular `type` attribute on the element, but is also needed by `ngrx-form-pure` internally.
 
 ##### `[stateValueTransformer]`: *`(value: any, e: Event) => any`*
 A **state value transformer** function is called when the field's **DOM** value changes. Value returned from this function is what the field's **state** value will be set to.
@@ -791,7 +795,7 @@ const formActions = getFormActions()('userForm');
 store.dispatch(formActions.initForm());
 ```
 
-The `AppFormsState` generic parameter is the type of the state tree under the top level `form` key, managed by `ngrx-form`. See the [TypeScript section](#typescript) for more details on this.
+The `AppFormsState` generic parameter is the type of the state tree under the top level `form` key, managed by `ngrx-form-pure`. See the [TypeScript section](#typescript) for more details on this.
 
 
 > **NOTE**  
@@ -801,7 +805,7 @@ The `AppFormsState` generic parameter is the type of the state tree under the to
 
 ### Action Creators
 
-The following is an exhaustive list of all the `ngrx-form` action creators of which the return value can be dispatched. Usually this will only need to be done in [custom components](#custom-components), and some of these actions you should *never™* need to dispatch,
+The following is an exhaustive list of all the `ngrx-form-pure` action creators of which the return value can be dispatched. Usually this will only need to be done in [custom components](#custom-components), and some of these actions you should *never™* need to dispatch,
  but they are documented just in case.
 
 
@@ -854,7 +858,7 @@ The *type* of the `values` parameter is more strongly typed as the *form shape*.
 ---
 
 ### Selectors
-Selectors are simply functions which convert part of the form state into a different format. Some common selectors are provided by `ngrx-form`.
+Selectors are simply functions which convert part of the form state into a different format. Some common selectors are provided by `ngrx-form-pure`.
 
 The current set of built-in selectors are as follows.
 
@@ -877,7 +881,7 @@ If there are no `initialValues` defined in state, this selector returns `false`.
 ---
 
 ### Field Validators
-The following set is the set of built-in field validators provided by `ngrx-form`.
+The following set is the set of built-in field validators provided by `ngrx-form-pure`.
 
 See the [field validation](#field-validation) section for an example of using field validation.
 
@@ -887,7 +891,7 @@ The validator returned by the `required` function resolves to an error in the fo
 
 ## Contributing & CI
 
-`ngrx-form` uses the following services/technologies for the CI and testing:
-- [Travis CI](travis-ci.org/alisd23/ngrx-form) for the CI, which runs unit and integration tests.
-- [Cypress](https://www.cypress.io/) for the integration tests (which run on Travis). Past integration test runs (including recordings of the tests) can be seen on the [Cypress ngrx-form dashboard](https://dashboard.cypress.io/#/projects/rep3hw/runs).
+`ngrx-form-pure` uses the following services/technologies for the CI and testing:
+- [Travis CI](travis-ci.org/alisd23/ngrx-form-pure) for the CI, which runs unit and integration tests.
+- [Cypress](https://www.cypress.io/) for the integration tests (which run on Travis). Past integration test runs (including recordings of the tests) can be seen on the [Cypress ngrx-form-pure dashboard](https://dashboard.cypress.io/#/projects/rep3hw/runs).
 - Karma & Jasmine for unit tests.

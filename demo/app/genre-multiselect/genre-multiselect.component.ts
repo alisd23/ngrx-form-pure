@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getFormActions, delayAction } from 'ngrx-form';
+import { getFormActions, delayAction } from 'ngrx-form-pure';
 
 import { AppFormState, AppState } from '../types';
 import { Genre } from '../enums';

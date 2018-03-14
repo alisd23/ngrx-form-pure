@@ -1,4 +1,4 @@
-import { IFormState, IFormReducerState } from 'ngrx-form';
+import { IFormState, IFormReducerState } from 'ngrx-form-pure';
 import { Colour, Band, Hobby, Genre } from './enums';
 
 // =========================//

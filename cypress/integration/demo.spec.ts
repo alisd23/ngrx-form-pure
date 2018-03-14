@@ -1,6 +1,6 @@
 import { DemoPage } from './demo.po';
 
-describe('ngrx-form integration tests', () => {
+describe('ngrx-form-pure integration tests', () => {
   let page: DemoPage;
 
   // Currently these tests all run in sequence, without a refresh inbetween.

@@ -21,3 +21,7 @@ script:
   - yarn run integration:ci
   - yarn run build:lib 
   - yarn run semantic-release
+
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+$/

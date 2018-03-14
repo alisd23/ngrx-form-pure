@@ -1,7 +1,6 @@
 {
   "name": "ngrx-form-pure",
   "repository": "https://github.com/alisd23/ngrx-form-pure.git",
-  "version": "1.0.0",
   "author": "Ali Sheehan-Dare <alisd23@live.co.uk>",
   "license": "MIT",
   "ngPackage": {

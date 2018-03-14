@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getFormValues, getFieldErrors } from 'ngrx-form';
+import { getFormValues, getFieldErrors } from 'ngrx-form-pure';
 
 import { AppState } from './types';
 

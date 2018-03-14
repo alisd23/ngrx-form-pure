@@ -7,17 +7,17 @@ import { IFormReducerState, IFieldErrors, IFormValues } from './types';
 // ========================= //
 
 export enum ActionConstants {
-  INIT_FORM = '@ngrx-form/init',
-  RESET_FORM = '@ngrx-form/reset-form',
-  DESTROY_FORM = '@ngrx-form/destroy',
-  FOCUS_FIELD = '@ngrx-form/focus',
-  BLUR_FIELD = '@ngrx-form/blur',
-  CHANGE_FIELD = '@ngrx-form/change',
-  RESET_FIELD = '@ngrx-form/reset-field',
-  UPDATE_FIELD_ERRORS = '@ngrx-form/update-field-errors',
-  REGISTER_FIELD = '@ngrx-form/register-field',
-  UNREGISTER_FIELD = '@ngrx-form/unregister-field',
-  SET_INITIAL_VALUES = '@ngrx-form/set-initial-values'
+  INIT_FORM = '@ngrx-form-pure/init',
+  RESET_FORM = '@ngrx-form-pure/reset-form',
+  DESTROY_FORM = '@ngrx-form-pure/destroy',
+  FOCUS_FIELD = '@ngrx-form-pure/focus',
+  BLUR_FIELD = '@ngrx-form-pure/blur',
+  CHANGE_FIELD = '@ngrx-form-pure-pure/change',
+  RESET_FIELD = '@ngrx-form-pure/reset-field',
+  UPDATE_FIELD_ERRORS = '@ngrx-form-pure/update-field-errors',
+  REGISTER_FIELD = '@ngrx-form-pure/register-field',
+  UNREGISTER_FIELD = '@ngrx-form-pure/unregister-field',
+  SET_INITIAL_VALUES = '@ngrx-form-pure/set-initial-values'
 }
 
 export interface InitFormAction<TRootFormsState> extends Action {

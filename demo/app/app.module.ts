@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { NgrxFormModule } from 'ngrx-form';
+import { NgrxFormModule } from 'ngrx-form-pure';
 import { storeLogger } from 'ngrx-store-logger';
 import { StoreModule, ActionReducer } from '@ngrx/store';
 import * as hljs from 'highlight.js';

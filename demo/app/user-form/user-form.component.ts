@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormState, IFieldErrors } from 'ngrx-form';
+import { getFormActions, getFieldErrors, IFieldValidators, validators, IFormState, IFieldErrors } from 'ngrx-form-pure';
 
 import { AppFormState, UserFormShape, AppState } from '../types';
 import { Colour, Band, Hobby } from '../enums';

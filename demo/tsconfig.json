@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "angularCompilerOptions": {
     "paths": {
-      "ngrx-form": [ "../src/index.ts" ]
+      "ngrx-form-pure": [ "../src/index.ts" ]
     }
   },
   "compilerOptions": {
@@ -11,7 +11,7 @@
     "baseUrl": "",
     "types": [],
     "paths": {
-      "ngrx-form": [ "../src/index.ts" ]
+      "ngrx-form-pure": [ "../src/index.ts" ]
     }
   },
   "files": [
